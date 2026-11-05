@@ -68,3 +68,14 @@ describe("toProductCardModel", () => {
     expect(toProductCardModel(product([{}])).optionsLabel).toBeNull();
   });
 });
+
+describe("toProductCardModel with filtered variants", () => {
+  it("prices from the variants that match active filters", () => {
+    const filtered = product([
+      { price: money(3400, "USD"), options: { Size: "Small" } },
+      { price: money(5400, "USD"), options: { Size: "Large" } },
+    ]);
+    const large = filtered.variants.filter((variant) => variant.options.Size === "Large");
+    expect(toProductCardModel(filtered, large).priceLabel).toBe("$54.00");
+  });
+});

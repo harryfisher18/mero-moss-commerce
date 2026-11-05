@@ -2,6 +2,7 @@ import {
   optionMatrix,
   priceRange,
   type Product,
+  type Variant,
   productAvailability,
 } from "@/domain/commerce/catalog";
 import { formatMoney } from "@/domain/commerce/money";
@@ -21,9 +22,17 @@ function pluralize(count: number, noun: string): string {
   return `${count} ${lower.endsWith("s") ? lower : `${lower}s`}`;
 }
 
-/** Derives everything a product card displays from catalog data only. */
-export function toProductCardModel(product: Product): ProductCardModel {
-  const range = priceRange(product);
+/**
+ * Derives everything a product card displays from catalog data only.
+ * `priceVariants` narrows the displayed price to variants matching active filters.
+ */
+export function toProductCardModel(
+  product: Product,
+  priceVariants: readonly Variant[] = product.variants,
+): ProductCardModel {
+  const range = priceRange({
+    variants: priceVariants.length > 0 ? priceVariants : product.variants,
+  });
   const priceLabel =
     range.min.amountMinor === range.max.amountMinor
       ? formatMoney(range.min)

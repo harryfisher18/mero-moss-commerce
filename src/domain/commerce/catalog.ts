@@ -12,6 +12,28 @@ export const CATEGORY_HANDLES = [
 ] as const;
 export type CategoryHandle = (typeof CATEGORY_HANDLES)[number];
 
+/** Canonical category definitions shared by seed data, routing and page metadata. */
+export const CATEGORY_DEFINITIONS: Readonly<
+  Record<CategoryHandle, { readonly title: string; readonly description: string }>
+> = {
+  "home-organization": {
+    title: "Home Organization",
+    description: "Baskets, bins and hooks that give everyday things a calm place to land.",
+  },
+  "table-and-kitchen": {
+    title: "Table & Kitchen",
+    description: "Stoneware, linen and wood for daily meals and slow weekends.",
+  },
+  workspace: {
+    title: "Workspace",
+    description: "Considered desk pieces that keep focus close and clutter out of sight.",
+  },
+  "travel-essentials": {
+    title: "Travel Essentials",
+    description: "Hard-wearing companions for weekends away and long journeys.",
+  },
+};
+
 export interface Category {
   readonly id: string;
   readonly handle: CategoryHandle;
