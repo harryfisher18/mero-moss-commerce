@@ -1,4 +1,8 @@
-import type { CategoryHandle } from "@/domain/commerce/catalog";
+import {
+  CATEGORY_DEFINITIONS,
+  CATEGORY_HANDLES,
+  type CategoryHandle,
+} from "@/domain/commerce/catalog";
 import type { PolicyKey } from "@/domain/commerce/policies";
 
 /**
@@ -46,28 +50,10 @@ export interface SeedPolicy {
 export const SEED_REFERENCE_DATE = "2026-11-01T09:00:00.000Z";
 export const SEED_CURRENCY = "USD" as const;
 
-export const SEED_CATEGORIES: SeedCategory[] = [
-  {
-    handle: "home-organization",
-    title: "Home Organization",
-    description: "Baskets, bins and hooks that give everyday things a calm place to land.",
-  },
-  {
-    handle: "table-and-kitchen",
-    title: "Table & Kitchen",
-    description: "Stoneware, linen and wood for daily meals and slow weekends.",
-  },
-  {
-    handle: "workspace",
-    title: "Workspace",
-    description: "Considered desk pieces that keep focus close and clutter out of sight.",
-  },
-  {
-    handle: "travel-essentials",
-    title: "Travel Essentials",
-    description: "Hard-wearing companions for weekends away and long journeys.",
-  },
-];
+export const SEED_CATEGORIES: SeedCategory[] = CATEGORY_HANDLES.map((handle) => ({
+  handle,
+  ...CATEGORY_DEFINITIONS[handle],
+}));
 
 export const SEED_PRODUCTS: SeedProduct[] = [
   // Home Organization

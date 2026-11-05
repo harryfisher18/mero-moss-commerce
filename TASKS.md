@@ -12,12 +12,12 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 ## M1 — Complete commerce loop (P0, must finish first)
 
 - [x] Catalog domain model, SQLite persistence and seeded Mero & Moss catalog with storefront home (#1)
-- [ ] Collection pages with filters, sorting, pagination and stable URL params (#2)
+- [x] Collection pages with filters, sorting, pagination and stable URL params (#2)
 - [ ] Product detail page with variant selection, availability and stored policies (#3)
 - [ ] Cart with persisted state, quantity edits, stock validation and totals in minor units (#4)
 - [ ] Demo checkout that creates simulated orders and decrements inventory atomically (#5)
 - [ ] Merchant authentication and orders console (`/admin/orders`) (#6)
-- [ ] Playwright E2E for Journey 1 (shopper to order) running in CI (#7)
+- [ ] Playwright E2E for Journey 1 (shopper to order) running in CI (#7). Playwright infrastructure and the CI job landed with #2; the full journey spec remains
 
 ## M2 — Observable commerce operations (P0)
 

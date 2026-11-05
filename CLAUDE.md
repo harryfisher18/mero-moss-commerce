@@ -69,7 +69,7 @@ npm run dev          # local dev server (http://localhost:3000)
 npm run lint         # ESLint + Prettier check
 npm run typecheck    # tsc --noEmit
 npm test             # Vitest unit/integration tests
-npm run test:e2e     # Playwright E2E (requires `npx playwright install chromium` once)
+npm run test:e2e     # Playwright E2E against a production build: run `npm run build` first; `npx playwright install chromium` once. Uses an isolated .data/e2e.db
 npm run build        # production build
 npm run check        # lint + typecheck + test + build (what CI runs)
 npm run db:reset     # recreate the local demo database from seed data
