@@ -72,7 +72,7 @@ npm test             # Vitest unit/integration tests
 npm run test:e2e     # Playwright E2E (requires `npx playwright install chromium` once)
 npm run build        # production build
 npm run check        # lint + typecheck + test + build (what CI runs)
-npm run db:reset     # recreate the local demo database from seed data (added with issue #1)
+npm run db:reset     # recreate the local demo database from seed data
 ```
 
 Never weaken, skip, or delete checks or tests to get green. Fix the root cause.
@@ -81,7 +81,7 @@ Never weaken, skip, or delete checks or tests to get green. Fix the root cause.
 
 - Default branch: `main`. Never commit directly to `main` after the initial bootstrap. All work goes through a PR.
 - Branches: `feat/issue-<n>-<slug>`, `fix/issue-<n>-<slug>`, `chore/issue-<n>-<slug>`, `docs/issue-<n>-<slug>`.
-- Commits: Conventional Commits (`feat(storefront): ...`, `fix(cart): ...`, `test: ...`, `ci: ...`, `docs: ...`, `chore: ...`).
+- Commits: Conventional Commits (`feat(storefront): ...`, `fix(cart): ...`, `test: ...`, `ci: ...`, `docs: ...`, `chore: ...`). Author is the repository owner only: never add `Co-Authored-By` trailers or Claude/AI attribution to commits.
 - PRs: summary, `Closes #<n>`, tests performed with results, risks and follow-ups. Squash-merge and delete the branch.
 - Git transport: SSH via the host alias `github-harry` (identity `harryfisher18`, the repository owner). The `gh` CLI must be the **harryfisher18** account for labels, protections and merges. Check with `gh api user --jq .login` and switch with `gh auth switch --user harryfisher18`.
 - Never force-push to `main`, bypass protections with admin rights, fake approvals, or disable checks.
