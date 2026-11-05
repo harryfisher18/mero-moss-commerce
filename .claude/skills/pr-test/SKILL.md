@@ -107,14 +107,14 @@ npm run test:e2e       # when E2E tests exist; run `npx playwright install chrom
    - `TASKS.md`: tick completed items with the issue number.
    - `docs/DEVLOG.md`: add an entry at the top (date, issue, summary, checks run with results, next recommendation). After `gh pr create`, add the PR URL to that entry in a small follow-up commit on the same branch.
    - Any product docs whose truth changed (`README.md`, `INTEGRATION_STATUS.md`, `TEST_RESULTS.md`, …).
-3. Commit with a Conventional Commit message, e.g. `feat(storefront): add collection filters and sorting (#12)`, ending with the attribution trailer required by the session.
+3. Commit with a Conventional Commit message, e.g. `feat(storefront): add collection filters and sorting (#12)`. The commit is authored by the repository owner only: do **not** add a `Co-Authored-By` trailer or any Claude/AI attribution.
 4. `git push -u origin <branch>`.
 5. Comment progress on the issue (what was implemented, checks run).
 6. Create the PR:
    ```bash
    gh pr create --base main --head <branch> --title "<conventional title>" --body-file <tmpfile>
    ```
-   Body sections: **Summary**, **Linked issue** (`Closes #<n>` only when fully resolved, otherwise `Refs #<n>`), **Changes**, **Tests performed** (exact commands and results), **Screenshots/flows verified** (only if actually done), **Risks and follow-ups**. End with the session's PR attribution line.
+   Body sections: **Summary**, **Linked issue** (`Closes #<n>` only when fully resolved, otherwise `Refs #<n>`), **Changes**, **Tests performed** (exact commands and results), **Screenshots/flows verified** (only if actually done), **Risks and follow-ups**.
 7. Review your own PR diff: `gh pr diff <n> --name-only` and `gh pr diff <n>`. Look for accidental files, credentials, and unrelated changes. Fix them with additional commits.
 8. Watch CI: `gh pr checks <n> --watch --fail-fast` (or poll `gh pr checks <n>`). On failure, read the logs with `gh run view <run-id> --log-failed`, fix, commit, push, and repeat.
 
@@ -127,6 +127,8 @@ gh pr view <n> --json mergeable,mergeStateStatus,reviewDecision,statusCheckRollu
 gh pr merge <n> --squash --delete-branch            # when green and mergeable
 gh pr merge <n> --squash --delete-branch --auto     # when checks/reviews are still pending and auto-merge is enabled
 ```
+
+> **Repository plan note (verified 2026-11-05):** the repo is private on GitHub Free, so branch protection, rulesets and auto-merge are unavailable (HTTP 403). Do not use `--auto`. Wait for `gh pr checks <n> --watch` to finish, confirm every check passed, then merge with `--squash --delete-branch`. If the plan changes, re-check `gh api repos/harryfisher18/mero-moss-commerce --jq .allow_auto_merge` and enable protection requiring the "Lint, typecheck, test, build" check.
 
 - Never use `--admin`, never force-push `main`, never approve your own PR with a fake account, never disable checks or protections.
 - If merging is blocked by permissions, required human review, or unresolved CI, leave the PR open and report the exact blocker.
