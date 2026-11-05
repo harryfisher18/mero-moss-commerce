@@ -18,6 +18,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (4 files, 29 tests) · `npm run build` pass (no warnings).
 - **Manual verification:** ran `next start`. `/` returns 200 with 34 product cards and 4 categories. Setting a variant's stock to 0 in the DB showed "Sold out" on the next request, which confirms request-time reads. The DB was reset afterwards.
 - **Not yet:** product cards are not links until the product page (#3) exists. Collection pages are #2. No E2E yet (#7).
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/18
 - **Next:** #2, collection pages with filters, sorting and pagination (or #3 product detail; both depend only on #1).
 
 ## 2026-11-05 — Bootstrap (M0)
