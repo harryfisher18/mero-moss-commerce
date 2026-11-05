@@ -19,6 +19,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (5 files, 46 tests) · `npm run build` pass · `npm run test:e2e` pass (10 tests: 5 specs × desktop/mobile).
 - **Findings fixed during testing:** notFound() in a streamed page returned 200, now fixed with Proxy. Chip removal left checkboxes checked, now fixed by resetting the form on URL change.
 - **Not yet:** product cards link to product pages in #3.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/19
 - **Next:** #3, the product detail page with variant selection.
 
 ## 2026-11-05 — Issue #1: Catalog foundation (M1)
