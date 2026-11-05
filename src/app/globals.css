@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Mero & Moss design tokens: warm, restrained, editorial. */
+:root {
+  --mm-paper: #f7f3ec;
+  --mm-ink: #2b2620;
+  --mm-muted: #6f665b;
+  --mm-moss: #4f5d3a;
+  --mm-clay: #b5653e;
+  --mm-line: #e2d9cb;
+}
+
+@theme inline {
+  --color-paper: var(--mm-paper);
+  --color-ink: var(--mm-ink);
+  --color-muted: var(--mm-muted);
+  --color-moss: var(--mm-moss);
+  --color-clay: var(--mm-clay);
+  --color-line: var(--mm-line);
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background: var(--mm-paper);
+  color: var(--mm-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--mm-moss);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
