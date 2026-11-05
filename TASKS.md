@@ -7,11 +7,11 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 ## M0 — Engineering foundation
 
 - [x] Repository bootstrap: Next.js 16 + strict TypeScript, ESLint, Vitest, CI workflow, `/pr-test` skill, CLAUDE.md, roadmap
-- [ ] Branch protection on `main` requiring CI (blocked until the `gh` CLI is authenticated as the owner; see DEVLOG)
+- [ ] Branch protection on `main` requiring CI: **not available** (GitHub returns 403 for private repos on the Free plan; requires GitHub Pro or a public repo). `/pr-test` compensates by merging only after verifying CI is green.
 
 ## M1 — Complete commerce loop (P0, must finish first)
 
-- [ ] Catalog domain model, SQLite persistence and seeded Mero & Moss catalog with storefront home (#1)
+- [x] Catalog domain model, SQLite persistence and seeded Mero & Moss catalog with storefront home (#1)
 - [ ] Collection pages with filters, sorting, pagination and stable URL params (#2)
 - [ ] Product detail page with variant selection, availability and stored policies (#3)
 - [ ] Cart with persisted state, quantity edits, stock validation and totals in minor units (#4)
