@@ -1,10 +1,14 @@
 import Link from "next/link";
+import { CATEGORY_DEFINITIONS, CATEGORY_HANDLES } from "@/domain/commerce/catalog";
 
 const NAV = [
-  { href: "/#featured", label: "Featured" },
-  { href: "/#categories", label: "Shop by category" },
+  { href: "/collections/all", label: "Shop all" },
+  ...CATEGORY_HANDLES.map((handle) => ({
+    href: `/collections/${handle}`,
+    label: CATEGORY_DEFINITIONS[handle].title,
+  })),
   { href: "/#policies", label: "Shipping & returns" },
-] as const;
+];
 
 export function StoreHeader() {
   return (

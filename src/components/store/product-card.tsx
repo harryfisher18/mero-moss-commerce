@@ -1,9 +1,16 @@
-import type { Product } from "@/domain/commerce/catalog";
+import type { Product, Variant } from "@/domain/commerce/catalog";
 import { ProductArt } from "./product-art";
 import { toProductCardModel } from "./product-card-model";
 
-export function ProductCard({ product }: { product: Product }) {
-  const model = toProductCardModel(product);
+export function ProductCard({
+  product,
+  priceVariants,
+}: {
+  product: Product;
+  /** Variants matching active collection filters; defaults to all variants. */
+  priceVariants?: readonly Variant[];
+}) {
+  const model = toProductCardModel(product, priceVariants);
   return (
     <article
       className="group flex flex-col"

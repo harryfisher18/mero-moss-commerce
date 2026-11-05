@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { ProductCard } from "@/components/store/product-card";
 import {
@@ -19,12 +20,12 @@ export default function HomePage() {
           Considered pieces for home organization, the table and kitchen, the workspace, and travel,
           chosen to be used every day and kept for years.
         </p>
-        <a
-          href="#featured"
+        <Link
+          href="/collections/all"
           className="mt-8 inline-block rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper hover:bg-moss"
         >
-          Shop featured pieces
-        </a>
+          Shop the collection
+        </Link>
       </section>
 
       <section
@@ -104,9 +105,13 @@ async function CategorySections() {
                 </h3>
                 <p className="mt-1 text-sm text-muted">{category.description}</p>
               </div>
-              <p className="text-sm text-muted">
-                {inCategory.length} {inCategory.length === 1 ? "piece" : "pieces"}
-              </p>
+              <Link
+                href={`/collections/${category.handle}`}
+                className="text-sm text-ink underline underline-offset-4 hover:text-moss"
+              >
+                View all {inCategory.length} {inCategory.length === 1 ? "piece" : "pieces"}
+                <span className="sr-only"> in {category.title}</span>
+              </Link>
             </div>
             {inCategory.length === 0 ? (
               <p className="mt-6 text-muted">Nothing in this category right now.</p>

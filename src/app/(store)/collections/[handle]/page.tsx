@@ -1,0 +1,100 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { CollectionResults } from "@/components/store/collection-results";
+import {
+  CATEGORY_DEFINITIONS,
+  CATEGORY_HANDLES,
+  type CategoryHandle,
+  isCategoryHandle,
+} from "@/domain/commerce/catalog";
+
+const ALL = "all";
+const COLLECTION_HANDLES: ReadonlyArray<typeof ALL | CategoryHandle> = [ALL, ...CATEGORY_HANDLES];
+
+interface CollectionInfo {
+  readonly handle: typeof ALL | CategoryHandle;
+  readonly title: string;
+  readonly description: string;
+}
+
+function collectionInfo(handle: string): CollectionInfo | null {
+  if (handle === ALL) {
+    return {
+      handle: ALL,
+      title: "Shop all",
+      description: "Every piece in the Mero & Moss collection, from the entryway to the open road.",
+    };
+  }
+  return isCategoryHandle(handle) ? { handle, ...CATEGORY_DEFINITIONS[handle] } : null;
+}
+
+export function generateStaticParams() {
+  return COLLECTION_HANDLES.map((handle) => ({ handle }));
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/collections/[handle]">): Promise<Metadata> {
+  const info = collectionInfo((await params).handle);
+  return info ? { title: info.title, description: info.description } : {};
+}
+
+export default async function CollectionPage({
+  params,
+  searchParams,
+}: PageProps<"/collections/[handle]">) {
+  const info = collectionInfo((await params).handle);
+  if (!info) notFound();
+
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-12 sm:px-6">
+      <nav aria-label="Breadcrumb" className="text-sm text-muted">
+        <ol className="flex gap-2">
+          <li>
+            <Link href="/" className="hover:text-ink hover:underline">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-ink">
+            {info.title}
+          </li>
+        </ol>
+      </nav>
+
+      <h1 className="mt-4 font-serif text-4xl">{info.title}</h1>
+      <p className="mt-2 max-w-2xl text-muted">{info.description}</p>
+
+      <nav aria-label="Collections" className="mt-6">
+        <ul className="flex flex-wrap gap-2 text-sm">
+          {COLLECTION_HANDLES.map((handle) => {
+            const current = handle === info.handle;
+            return (
+              <li key={handle}>
+                <Link
+                  href={`/collections/${handle}`}
+                  aria-current={current ? "page" : undefined}
+                  className={`inline-block rounded-full border px-4 py-1.5 ${
+                    current ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"
+                  }`}
+                >
+                  {handle === ALL ? "All" : CATEGORY_DEFINITIONS[handle].title}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <Suspense fallback={<p className="mt-10 text-muted">Loading products…</p>}>
+        <CollectionResults
+          basePath={`/collections/${info.handle}`}
+          categoryHandle={info.handle === ALL ? undefined : info.handle}
+          searchParams={searchParams}
+        />
+      </Suspense>
+    </div>
+  );
+}
