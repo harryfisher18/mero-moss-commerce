@@ -4,6 +4,25 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-06: Issue #3, product detail page (M1)
+
+- **Previous cycle:** issue #2 merged as `6bcb01b` (PR #19). Both CI jobs were green on main.
+- **Issue:** [#3](https://github.com/harryfisher18/mero-moss-commerce/issues/3), the product detail page with variant selection, availability and stored policies.
+- **Implemented:**
+  - Pure `variant-selection` domain module:
+    - Default variant is the first in-stock one, and `?variant=` resolution falls back safely.
+    - Per-option value states keep the other selections when that combination exists; otherwise they move to the best variant.
+    - Compare-at prices display only when genuinely higher.
+    - Availability messages come from real stock.
+    - `validatePurchase` is the server-side guard: active product, in-stock variant, integer quantity from 1 to min(stock, 10).
+    - Related products rank same category first, then in stock.
+  - `/products/[handle]` (Partial Prerender, streamed product view). Accessible option links that work without JS and keep URLs stable; price, compare-at and availability per variant; SKU, materials and care; shipping, returns and warranty from stored policies; related products; breadcrumbs.
+  - Unknown or draft products get a real HTTP 404: Proxy runs one indexed `isActiveProductHandle` lookup before rendering, with `notFound()` as a render-time fallback.
+  - Product cards link to product pages (stretched link). Filtered collection cards deep-link to the first matching in-stock variant.
+- **Scope decision:** the quantity input and Add to cart button move to #4, which wires them to `validatePurchase`. Shipping them now would mean a dead control. Recorded on #3 and #4.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (6 files, 62 tests) · `npm run build` pass · `npm run test:e2e` pass (20 tests: 10 specs × desktop/mobile) · `next dev` smoke check: product 200, unknown product 404.
+- **Next:** #4, the cart with persisted state, Add to cart on the product page, quantity edits and stock validation.
+
 ## 2026-11-05: Issue #2, collection pages (M1)
 
 - **Previous cycle:** issue #1 merged as `6b7bb96` (PR #18). CI was green on main.

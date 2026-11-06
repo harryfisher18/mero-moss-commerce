@@ -24,6 +24,8 @@ export interface CatalogRepository {
   listCategories(): Category[];
   listProducts(query?: ProductQuery): Product[];
   getProductByHandle(handle: string, statuses?: readonly ProductStatus[]): Product | null;
+  /** Cheap indexed existence check for an active product handle (used before rendering). */
+  isActiveProductHandle(handle: string): boolean;
   countActiveProductsByCategory(): Record<CategoryHandle, number>;
   listPolicies(): StorePolicy[];
 }
@@ -146,6 +148,14 @@ export class SqliteCatalogRepository implements CatalogRepository {
       .get(handle, ...statuses);
     if (!row) return null;
     return this.attachVariants([productRow.parse(row)])[0] ?? null;
+  }
+
+  isActiveProductHandle(handle: string): boolean {
+    return (
+      this.db
+        .prepare("SELECT 1 AS found FROM products WHERE handle = ? AND status = 'active' LIMIT 1")
+        .get(handle) !== undefined
+    );
   }
 
   countActiveProductsByCategory(): Record<CategoryHandle, number> {
