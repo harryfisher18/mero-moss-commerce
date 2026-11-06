@@ -21,6 +21,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - Product cards link to product pages (stretched link). Filtered collection cards deep-link to the first matching in-stock variant.
 - **Scope decision:** the quantity input and Add to cart button move to #4, which wires them to `validatePurchase`. Shipping them now would mean a dead control. Recorded on #3 and #4.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (6 files, 62 tests) · `npm run build` pass · `npm run test:e2e` pass (20 tests: 10 specs × desktop/mobile) · `next dev` smoke check: product 200, unknown product 404.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/20
 - **Next:** #4, the cart with persisted state, Add to cart on the product page, quantity edits and stock validation.
 
 ## 2026-11-05: Issue #2, collection pages (M1)
