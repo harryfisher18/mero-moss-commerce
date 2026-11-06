@@ -130,3 +130,12 @@ describe("SqliteCatalogRepository", () => {
     expect(repo.getProductByHandle("does-not-exist")).toBeNull();
   });
 });
+
+describe("isActiveProductHandle", () => {
+  it("is true only for existing active products", () => {
+    expect(repo.isActiveProductHandle("felt-desk-mat")).toBe(true);
+    expect(repo.isActiveProductHandle("does-not-exist")).toBe(false);
+    db.prepare("UPDATE products SET status = 'draft' WHERE handle = 'felt-desk-mat'").run();
+    expect(repo.isActiveProductHandle("felt-desk-mat")).toBe(false);
+  });
+});

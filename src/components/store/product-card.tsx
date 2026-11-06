@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Product, Variant } from "@/domain/commerce/catalog";
 import { ProductArt } from "./product-art";
 import { toProductCardModel } from "./product-card-model";
@@ -13,7 +14,7 @@ export function ProductCard({
   const model = toProductCardModel(product, priceVariants);
   return (
     <article
-      className="group flex flex-col"
+      className="group relative flex flex-col"
       data-testid="product-card"
       data-handle={product.handle}
     >
@@ -29,7 +30,15 @@ export function ProductCard({
           </span>
         )}
       </div>
-      <h3 className="mt-3 font-serif text-lg leading-snug">{model.title}</h3>
+      <h3 className="mt-3 font-serif text-lg leading-snug">
+        {/* Stretched link: the whole card is clickable, with one accessible link name. */}
+        <Link
+          href={model.href}
+          className="after:absolute after:inset-0 after:content-[''] group-hover:underline focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-moss"
+        >
+          {model.title}
+        </Link>
+      </h3>
       <p className="mt-1 text-sm text-muted">{model.summary}</p>
       <p className="mt-2 flex flex-wrap items-baseline gap-x-3 text-sm">
         <span className="font-medium text-ink">{model.priceLabel}</span>

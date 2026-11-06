@@ -79,3 +79,19 @@ describe("toProductCardModel with filtered variants", () => {
     expect(toProductCardModel(filtered, large).priceLabel).toBe("$54.00");
   });
 });
+
+describe("product card link", () => {
+  it("links to the product page", () => {
+    expect(toProductCardModel(product([{}, {}])).href).toBe("/products/x");
+  });
+
+  it("deep-links to the first in-stock matching variant when filters narrow the choice", () => {
+    const filtered = product([
+      { options: { Color: "Oat" }, inventoryQuantity: 0 },
+      { options: { Color: "Oat" }, inventoryQuantity: 3 },
+      { options: { Color: "Charcoal" } },
+    ]);
+    const oat = filtered.variants.filter((variant) => variant.options.Color === "Oat");
+    expect(toProductCardModel(filtered, oat).href).toBe("/products/x?variant=v1");
+  });
+});
