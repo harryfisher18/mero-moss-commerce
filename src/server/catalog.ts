@@ -36,3 +36,7 @@ export async function getProductCountsByCategory(): Promise<Record<CategoryHandl
 export async function getStorePolicies() {
   return (await catalog()).listPolicies();
 }
+
+export async function getProduct(handle: string) {
+  return (await catalog()).getProductByHandle(handle);
+}

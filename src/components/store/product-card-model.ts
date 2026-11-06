@@ -8,6 +8,8 @@ import {
 import { formatMoney } from "@/domain/commerce/money";
 
 export interface ProductCardModel {
+  /** Product page URL; deep-links to a matching variant when filters narrowed the choice. */
+  readonly href: string;
   readonly title: string;
   readonly summary: string;
   readonly priceLabel: string;
@@ -48,7 +50,16 @@ export function toProductCardModel(
       ? options.map((option) => pluralize(option.values.length, option.name)).join(" · ")
       : null;
 
+  const narrowed = priceVariants.length > 0 && priceVariants.length < product.variants.length;
+  const linkVariant = narrowed
+    ? (priceVariants.find((variant) => variant.inventoryQuantity > 0) ?? priceVariants[0])
+    : undefined;
+  const href = `/products/${product.handle}${
+    linkVariant ? `?variant=${encodeURIComponent(linkVariant.id)}` : ""
+  }`;
+
   return {
+    href,
     title: product.title,
     summary: product.summary,
     priceLabel,
