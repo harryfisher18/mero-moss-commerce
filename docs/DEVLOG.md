@@ -4,6 +4,13 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-07: Repository settings (M0)
+
+- **Co-author:** PR #21 (merged as `88db869`) makes every commit and squash merge carry a `Co-authored-by` trailer for Dominik Lubański (Dominic6018), the project mentor.
+- **Visibility:** the owner made the repository **public**. Before relying on that, I scanned all git history for tokens, private keys, `.env` and database files and found none.
+- **Protection applied:** `main` requires a PR and both CI checks (strict, up to date), with linear history, conversation resolution, no force pushes or deletions, enforced for admins, and 0 required approvals. Auto-merge, secret scanning and push protection are enabled.
+- **Next:** #4, the cart.
+
 ## 2026-11-06: Issue #3, product detail page (M1)
 
 - **Previous cycle:** issue #2 merged as `6bcb01b` (PR #19). Both CI jobs were green on main.

@@ -7,7 +7,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 ## M0 — Engineering foundation
 
 - [x] Repository bootstrap: Next.js 16 + strict TypeScript, ESLint, Vitest, CI workflow, `/pr-test` skill, CLAUDE.md, roadmap
-- [ ] Branch protection on `main` requiring CI: **not available** (GitHub returns 403 for private repos on the Free plan; requires GitHub Pro or a public repo). `/pr-test` compensates by merging only after verifying CI is green.
+- [x] Branch protection on `main`: PR required, both CI checks required and up to date, linear history, no force pushes or deletions, enforced for admins; auto-merge and secret-scanning push protection enabled (repo made public on 2026-11-07)
 
 ## M1 — Complete commerce loop (P0, must finish first)
 
