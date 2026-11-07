@@ -25,6 +25,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - An E2E helper race: login didn't wait for the redirect.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (12 files, 114 tests) · `npm run build` pass · `npm run test:e2e` pass (44 tests: 22 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass (`/admin/orders` 307 to login, login 200).
 - **Milestone:** M1, the complete commerce loop, is done. Journey 1 passes end to end in CI.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/26
 - **Next:** #8, the merchant product editor that propagates to the storefront with an audit log (Journey 2).
 
 ## 2026-11-07: Issue #5, demo checkout (M1)
