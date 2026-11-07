@@ -81,4 +81,48 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+  {
+    version: 3,
+    name: "orders",
+    sql: `
+      -- DEMO store: every order is simulated. No payment data is ever stored.
+      CREATE TABLE orders (
+        id                 TEXT PRIMARY KEY,
+        sequence           INTEGER NOT NULL UNIQUE CHECK (sequence > 0),
+        order_number       TEXT NOT NULL UNIQUE,
+        status             TEXT NOT NULL DEFAULT 'placed'
+                             CHECK (status IN ('placed', 'processing', 'fulfilled', 'cancelled')),
+        is_simulated       INTEGER NOT NULL DEFAULT 1 CHECK (is_simulated = 1),
+        email              TEXT NOT NULL,
+        full_name          TEXT NOT NULL,
+        address1           TEXT NOT NULL,
+        address2           TEXT NOT NULL DEFAULT '',
+        city               TEXT NOT NULL,
+        region             TEXT NOT NULL,
+        postal_code        TEXT NOT NULL,
+        country            TEXT NOT NULL,
+        currency           TEXT NOT NULL,
+        subtotal_minor     INTEGER NOT NULL CHECK (subtotal_minor >= 0),
+        shipping_minor     INTEGER NOT NULL CHECK (shipping_minor >= 0),
+        total_minor        INTEGER NOT NULL CHECK (total_minor >= 0),
+        confirmation_token TEXT NOT NULL UNIQUE,
+        created_at         TEXT NOT NULL
+      );
+      CREATE INDEX orders_created_idx ON orders(created_at);
+
+      CREATE TABLE order_lines (
+        order_id         TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+        position         INTEGER NOT NULL,
+        variant_id       TEXT NOT NULL,
+        product_id       TEXT NOT NULL,
+        sku              TEXT NOT NULL,
+        product_title    TEXT NOT NULL,
+        variant_title    TEXT,
+        unit_price_minor INTEGER NOT NULL CHECK (unit_price_minor >= 0),
+        quantity         INTEGER NOT NULL CHECK (quantity > 0),
+        line_total_minor INTEGER NOT NULL CHECK (line_total_minor >= 0),
+        PRIMARY KEY (order_id, position)
+      );
+    `,
+  },
 ];
