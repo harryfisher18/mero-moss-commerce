@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "db:reset": "tsx scripts/db-reset.ts",
-    "merchant:hash": "tsx scripts/merchant-hash.ts"
+    "merchant:hash": "tsx scripts/merchant-hash.ts",
+    "worker": "tsx scripts/automation-worker.ts"
   },
   "dependencies": {
     "next": "16.4.5",
