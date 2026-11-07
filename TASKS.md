@@ -23,7 +23,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 ## M2 — Observable commerce operations (P0)
 
 - [x] Merchant product editor (price, stock, details) that propagates to the storefront, with an audit log (Journey 2) (#8)
-- [ ] Durable order event outbox and worker: routing tags, notification preview, idempotent replay, bounded retries, dead letter, job inspector (Journey 3) (#9)
+- [x] Durable order event outbox and worker: routing tags, notification preview, idempotent replay, bounded retries, dead letter, job inspector (Journey 3) (#9)
 - [ ] Upgrade Lab: interactive, clearly illustrative before/after for product page, discovery and order operations (#10)
 
 ## M3 — Applied AI grounded in commerce data (P0)
@@ -46,5 +46,5 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 - [x] Journey 1 — Shopper to order (#7)
 - [x] Journey 2 — Merchant change propagates (#8; AI advisor part follows with #11)
-- [ ] Journey 3 — Order automation is real
+- [x] Journey 3 — Order automation is real (#9; verified Shopify webhook delivery, when configured, follows with #14)
 - [ ] Journey 4 — AI-enhanced business workflow

@@ -178,4 +178,61 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX catalog_audit_product_idx ON catalog_audit_events(product_id, id);
     `,
   },
+  {
+    version: 6,
+    name: "order_automation",
+    sql: `
+      -- Transactional outbox. The event id doubles as the idempotency key for every effect.
+      CREATE TABLE outbox_events (
+        id              TEXT PRIMARY KEY,
+        type            TEXT NOT NULL CHECK (type IN ('order.created', 'automation.drill')),
+        aggregate_id    TEXT NOT NULL,
+        subject         TEXT NOT NULL,
+        payload         TEXT NOT NULL,
+        status          TEXT NOT NULL DEFAULT 'pending'
+                          CHECK (status IN ('pending', 'succeeded', 'dead')),
+        attempts        INTEGER NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+        max_attempts    INTEGER NOT NULL CHECK (max_attempts > 0),
+        next_attempt_at TEXT NOT NULL,
+        last_error      TEXT,
+        created_at      TEXT NOT NULL,
+        processed_at    TEXT
+      );
+      CREATE INDEX outbox_due_idx ON outbox_events(status, next_attempt_at);
+      CREATE INDEX outbox_aggregate_idx ON outbox_events(aggregate_id);
+      CREATE INDEX outbox_created_idx ON outbox_events(created_at);
+
+      CREATE TABLE job_attempts (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id    TEXT NOT NULL REFERENCES outbox_events(id) ON DELETE CASCADE,
+        trigger     TEXT NOT NULL CHECK (trigger IN ('worker', 'retry_now', 'replay')),
+        outcome     TEXT NOT NULL CHECK (outcome IN ('succeeded', 'duplicate', 'failed', 'dead')),
+        detail      TEXT NOT NULL DEFAULT '',
+        created_at  TEXT NOT NULL
+      );
+      CREATE INDEX job_attempts_event_idx ON job_attempts(event_id, id);
+
+      -- Effects. Unique keys make reprocessing the same event a no-op.
+      CREATE TABLE order_tags (
+        order_id        TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+        tag             TEXT NOT NULL,
+        source_event_id TEXT NOT NULL REFERENCES outbox_events(id) ON DELETE CASCADE,
+        created_at      TEXT NOT NULL,
+        PRIMARY KEY (order_id, tag)
+      );
+
+      -- Recorded previews only. Nothing in this project delivers messages.
+      CREATE TABLE notification_previews (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id   TEXT NOT NULL REFERENCES outbox_events(id) ON DELETE CASCADE,
+        kind       TEXT NOT NULL CHECK (kind IN ('customer_confirmation', 'merchant_review')),
+        recipient  TEXT NOT NULL,
+        subject    TEXT NOT NULL,
+        body       TEXT NOT NULL,
+        delivery   TEXT NOT NULL DEFAULT 'preview_only' CHECK (delivery = 'preview_only'),
+        created_at TEXT NOT NULL,
+        UNIQUE (event_id, kind)
+      );
+    `,
+  },
 ];

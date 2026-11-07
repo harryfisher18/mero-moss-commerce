@@ -1,8 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { type CheckoutField, checkoutDetailsSchema, problemMessage } from "@/domain/commerce/order";
+import { drainOutbox } from "@/server/automation";
 import { readCartId } from "@/server/cart-session";
 import { completeCheckoutSession, orderService } from "@/server/checkout-session";
 
@@ -76,5 +78,7 @@ export async function placeOrder(
   }
 
   await completeCheckoutSession(result.confirmationToken);
+  // The order.created event is already committed; process it once the response is sent.
+  after(drainOutbox);
   redirect("/checkout/confirmation");
 }
