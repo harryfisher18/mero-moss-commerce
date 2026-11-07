@@ -107,7 +107,14 @@ npm run test:e2e       # when E2E tests exist; run `npx playwright install chrom
    - `TASKS.md`: tick completed items with the issue number.
    - `docs/DEVLOG.md`: add an entry at the top (date, issue, summary, checks run with results, next recommendation). After `gh pr create`, add the PR URL to that entry in a small follow-up commit on the same branch.
    - Any product docs whose truth changed (`README.md`, `INTEGRATION_STATUS.md`, `TEST_RESULTS.md`, …).
-3. Commit with a Conventional Commit message, e.g. `feat(storefront): add collection filters and sorting (#12)`. The commit is authored by the repository owner only: do **not** add a `Co-Authored-By` trailer or any Claude/AI attribution.
+3. Commit with a Conventional Commit message, e.g. `feat(storefront): add collection filters and sorting (#12)`. The commit author is the repository owner (harryfisher18). End **every** commit message with a blank line and the mentor co-author trailer:
+
+   ```text
+   Co-authored-by: Dominik Lubański <305895616+Dominic6018@users.noreply.github.com>
+   ```
+
+   Never add Claude/AI attribution.
+
 4. `git push -u origin <branch>`.
 5. Comment progress on the issue (what was implemented, checks run).
 6. Create the PR:
@@ -124,11 +131,13 @@ Merge only when **all** of these hold: required checks pass, there are no unreso
 
 ```bash
 gh pr view <n> --json mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
-gh pr merge <n> --squash --delete-branch            # when green and mergeable
-gh pr merge <n> --squash --delete-branch --auto     # when checks/reviews are still pending and auto-merge is enabled
+gh pr merge <n> --squash --delete-branch --body-file <merge-body>   # when green and mergeable
+gh pr merge <n> --squash --delete-branch --auto --body-file <merge-body>   # when pending and auto-merge is enabled
 ```
 
-> **Repository plan note (verified 2026-11-05):** the repo is private on GitHub Free, so branch protection, rulesets and auto-merge are unavailable (HTTP 403). Do not use `--auto`. Wait for `gh pr checks <n> --watch` to finish, confirm every check passed, then merge with `--squash --delete-branch`. If the plan changes, re-check `gh api repos/harryfisher18/mero-moss-commerce --jq .allow_auto_merge` and enable protection requiring the "Lint, typecheck, test, build" check.
+The squash commit message comes from `--body-file`. Write a short summary of the PR there, ending with a blank line and the mentor `Co-authored-by` trailer, or GitHub drops the trailer. After merging, verify it with `git log -1 --format=%B origin/main | grep Co-authored-by`.
+
+> **Repository plan note (verified 2026-11-05):** the repo is private on GitHub Free, so branch protection, rulesets and auto-merge are unavailable (HTTP 403). Do not use `--auto`. Wait for `gh pr checks <n> --watch` to finish, confirm every check passed, then merge with `--squash --delete-branch --body-file <merge-body>`. If the plan changes, re-check `gh api repos/harryfisher18/mero-moss-commerce --jq .allow_auto_merge` and enable protection requiring the "Lint, typecheck, test, build" check.
 
 - Never use `--admin`, never force-push `main`, never approve your own PR with a fake account, never disable checks or protections.
 - If merging is blocked by permissions, required human review, or unresolved CI, leave the PR open and report the exact blocker.
