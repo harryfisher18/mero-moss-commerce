@@ -7,6 +7,7 @@ import {
   type ProductStatus,
   type Variant,
 } from "@/domain/commerce/catalog";
+import type { CatalogEntry } from "@/domain/commerce/cart";
 import { money, SUPPORTED_CURRENCIES } from "@/domain/commerce/money";
 import { POLICY_KEYS, type StorePolicy } from "@/domain/commerce/policies";
 import type { Database } from "@/server/db/database";
@@ -24,6 +25,8 @@ export interface CatalogRepository {
   listCategories(): Category[];
   listProducts(query?: ProductQuery): Product[];
   getProductByHandle(handle: string, statuses?: readonly ProductStatus[]): Product | null;
+  /** Variants (any product status) with their products, keyed by variant id. */
+  getCatalogEntries(variantIds: readonly string[]): Map<string, CatalogEntry>;
   /** Cheap indexed existence check for an active product handle (used before rendering). */
   isActiveProductHandle(handle: string): boolean;
   countActiveProductsByCategory(): Record<CategoryHandle, number>;
@@ -148,6 +151,26 @@ export class SqliteCatalogRepository implements CatalogRepository {
       .get(handle, ...statuses);
     if (!row) return null;
     return this.attachVariants([productRow.parse(row)])[0] ?? null;
+  }
+
+  getCatalogEntries(variantIds: readonly string[]): Map<string, CatalogEntry> {
+    const entries = new Map<string, CatalogEntry>();
+    const ids = [...new Set(variantIds)];
+    if (ids.length === 0) return entries;
+    const rows = this.db
+      .prepare(
+        `SELECT p.*, c.handle AS category_handle
+         FROM products p JOIN categories c ON c.id = p.category_id
+         WHERE p.id IN (SELECT product_id FROM variants WHERE id IN (${ids.map(() => "?").join(", ")}))`,
+      )
+      .all(...ids)
+      .map((row) => productRow.parse(row));
+    for (const product of this.attachVariants(rows)) {
+      for (const variant of product.variants) {
+        if (ids.includes(variant.id)) entries.set(variant.id, { product, variant });
+      }
+    }
+    return entries;
   }
 
   isActiveProductHandle(handle: string): boolean {
