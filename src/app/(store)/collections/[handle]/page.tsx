@@ -41,15 +41,48 @@ export async function generateMetadata({
   return info ? { title: info.title, description: info.description } : {};
 }
 
-export default async function CollectionPage({
+/**
+ * Not async: `params` is only awaited inside the Suspense boundary below. Known handles are
+ * still fully prerendered via generateStaticParams, and the generic `[handle]` shell can be
+ * regenerated at runtime (for example after `revalidatePath`) without reading params
+ * outside Suspense, which made Next.js fail the prerender with a 500 (#23).
+ */
+export default function CollectionPage({
   params,
   searchParams,
 }: PageProps<"/collections/[handle]">) {
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-12 sm:px-6">
+      <Suspense fallback={<CollectionSkeleton />}>
+        <CollectionContent params={params} searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+function CollectionSkeleton() {
+  return (
+    <div aria-hidden="true">
+      <div className="h-5 w-32 animate-pulse rounded-sm bg-line/60" />
+      <div className="mt-4 h-10 w-64 animate-pulse rounded-sm bg-line/60" />
+      <div className="mt-3 h-5 w-full max-w-xl animate-pulse rounded-sm bg-line/60" />
+    </div>
+  );
+}
+
+async function CollectionContent({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ handle: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const info = collectionInfo((await params).handle);
+  // Proxy already turns unknown handles into a real 404; this guards direct renders.
   if (!info) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-12 sm:px-6">
+    <>
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <ol className="flex gap-2">
           <li>
@@ -95,6 +128,6 @@ export default async function CollectionPage({
           searchParams={searchParams}
         />
       </Suspense>
-    </div>
+    </>
   );
 }

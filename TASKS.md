@@ -15,7 +15,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Collection pages with filters, sorting, pagination and stable URL params (#2)
 - [x] Product detail page with variant selection, availability and stored policies (#3)
 - [x] Cart with persisted state, quantity edits, stock validation and totals in minor units (#4)
-- [ ] Collection page shell must survive path revalidation (#23, P1 bug found during #4)
+- [x] Collection page shell must survive path revalidation (#23, P1 bug found during #4)
 - [x] Demo checkout that creates simulated orders and decrements inventory atomically (#5)
 - [x] Merchant authentication and orders console (`/admin/orders`) (#6)
 - [x] Playwright E2E for Journey 1 (shopper to order) running in CI (#7)
