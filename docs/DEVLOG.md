@@ -4,6 +4,30 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-07: Issues #6 + #7, merchant console and Journey 1 E2E (M1)
+
+- **Previous cycle:** #5 merged as `5f0d59c` (PR #25) through auto-merge. Both checks were green on main.
+- **Issues:** [#6](https://github.com/harryfisher18/mero-moss-commerce/issues/6), merchant authentication and orders console. [#7](https://github.com/harryfisher18/mero-moss-commerce/issues/7), the Journey 1 E2E in CI. I did them together because #7's last step needs #6.
+- **Implemented:**
+  - Domain:
+    - Order status lifecycle (placed → processing → fulfilled; placed/processing → cancelled; terminal states; cancellation restocks).
+    - scrypt password hashing with bounded parameters and timing-safe compare, constant-time email match, and a login rate-limit rule (5 failures per 15 minutes).
+    - `safeAdminPath` open-redirect guard.
+  - Migration 4 adds `merchant_sessions` (SHA-256 of the token only, expiry), `login_attempts` and `order_status_events` (audit of from, to, actor and time). Order placement records the first "placed" event.
+  - `MerchantAuthService`: login with rate limiting, always running the hash check; random 256-bit tokens; 8 h sessions; verify and logout. `MerchantOrderService` lists and reads orders and applies transitions in a transaction, with audit and restock.
+  - Demo credentials come from env, with a documented public default shown on the login page only while active. `npm run merchant:hash` generates a hash.
+  - Cookie `mm_admin`: httpOnly, SameSite=Strict, Secure in production.
+  - Proxy redirects signed-out `/admin/*` requests (307 with `next`) before rendering. Every page and Server Action re-verifies with `requireMerchant()`.
+  - `/admin/orders` has status filters and a table of number, date, customer, items, total and status. `/admin/orders/[id]` shows lines, totals, customer, validated status actions and history. The console layout has a "Demo data" badge and sign out.
+  - E2E: a full Journey 1 spec (home → collection → filter → product → variant → cart → quantity → checkout → merchant sees the order with a matching total) and an admin spec (307 redirect, wrong password, sign in and out, lifecycle with history, cancel restocks, status filter).
+- **Findings fixed during testing:**
+  - The session check read the clock during prerendering, which errored on `/admin/orders`. Fixed with `await connection()` before the session read.
+  - An E2E helper race: login didn't wait for the redirect.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (12 files, 114 tests) · `npm run build` pass · `npm run test:e2e` pass (44 tests: 22 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass (`/admin/orders` 307 to login, login 200).
+- **Milestone:** M1, the complete commerce loop, is done. Journey 1 passes end to end in CI.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/26
+- **Next:** #8, the merchant product editor that propagates to the storefront with an audit log (Journey 2).
+
 ## 2026-11-07: Issue #5, demo checkout (M1)
 
 - **Previous cycle:** #4 merged as `bd29929` (PR #24) through auto-merge. Both checks were green on main.

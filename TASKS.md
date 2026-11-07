@@ -17,8 +17,8 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Cart with persisted state, quantity edits, stock validation and totals in minor units (#4)
 - [ ] Collection page shell must survive path revalidation (#23, P1 bug found during #4)
 - [x] Demo checkout that creates simulated orders and decrements inventory atomically (#5)
-- [ ] Merchant authentication and orders console (`/admin/orders`) (#6)
-- [ ] Playwright E2E for Journey 1 (shopper to order) running in CI (#7). Playwright infrastructure and the CI job landed with #2; the full journey spec remains
+- [x] Merchant authentication and orders console (`/admin/orders`) (#6)
+- [x] Playwright E2E for Journey 1 (shopper to order) running in CI (#7)
 
 ## M2 — Observable commerce operations (P0)
 
@@ -44,7 +44,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 ## Mandatory journeys (acceptance gates)
 
-- [ ] Journey 1 — Shopper to order
+- [x] Journey 1 — Shopper to order (#7)
 - [ ] Journey 2 — Merchant change propagates
 - [ ] Journey 3 — Order automation is real
 - [ ] Journey 4 — AI-enhanced business workflow

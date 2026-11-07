@@ -223,6 +223,24 @@ export interface ShippingAddress {
   readonly country: "US";
 }
 
+export interface OrderSummary {
+  readonly id: string;
+  readonly orderNumber: string;
+  readonly status: OrderStatus;
+  readonly customerName: string;
+  readonly email: string;
+  readonly itemCount: number;
+  readonly total: Money;
+  readonly createdAt: string;
+}
+
+export interface OrderStatusEvent {
+  readonly fromStatus: OrderStatus | null;
+  readonly toStatus: OrderStatus;
+  readonly actor: string;
+  readonly createdAt: string;
+}
+
 /** A persisted order. `isSimulated` is always true in this demo store. */
 export interface Order {
   readonly id: string;
