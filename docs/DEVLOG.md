@@ -16,6 +16,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Verified with the same reproduction after the fix:** 200 with the correct `<h1>` for both collections, 404 for an unknown handle, 200 for product pages, and no errors in the server log. The temporary code was then reverted.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (21 files, 211 tests) · `npm run build` pass (collection routes still Partial Prerender) · `npm run test:e2e` pass (66 tests).
 - **Regression coverage:** no product code calls `revalidatePath` (all catalog reads are request-time), so a permanent automated test would need speculative revalidation. The manual reproduction above is documented in the PR instead.
+- **PR:** [#31](https://github.com/harryfisher18/mero-moss-commerce/pull/31)
 - **Next:** #10, Upgrade Lab (P1).
 
 ## 2026-11-08: Issue #12, AI Content Studio (M3, Journey 4b)
