@@ -20,6 +20,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - `/admin/automations` shows the job log with status filters and counts, the retry policy, "Run due jobs" and the failure drills. `/admin/automations/[id]` shows tags, notification previews marked "Preview only · not sent", the redacted payload, details, the attempt log, Replay and Retry now. Order detail gains an Automation panel, and the console nav gains Automations.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (17 files, 159 tests) · `npm run build` pass · `npm run test:e2e` pass (54 tests: 27 specs × desktop/mobile) · `npm run worker -- --once` processed a due drill and scheduled its retry · `next dev` smoke check pass (automation routes 307 to login when signed out).
 - **Journey 3 status:** done for the demo store, and E2E-proven: event → worker → tags and previews, idempotent replay, retries, and the dead letter with operator action. Verified Shopify webhook delivery (step 1, "if configured") belongs to #14. No live side effects exist to authorize.
+- **PR:** [#28](https://github.com/harryfisher18/mero-moss-commerce/pull/28)
 - **Next:** #11, the AI Shopping Advisor grounded in catalog data (Journey 4; it also completes the AI part of Journey 2).
 
 ## 2026-11-07: Issue #8, merchant product editor (M2, Journey 2)
