@@ -8,13 +8,13 @@ Mero & Moss is a working e-commerce product for a direct-to-consumer home and ev
 
 ## What merchants can evaluate
 
-| If you need…                         | Try this in Mero & Moss                                           | Status                                                                                       |
-| ------------------------------------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| A new or modernized online store     | Storefront browsing, filters, variants, cart, simulated checkout  | Browse → cart → simulated checkout → order confirmation done; merchant orders view next (M1) |
-| Order operations without manual work | Order events, routing, retries and replay in the merchant console | Planned (M2)                                                                                 |
-| Better product discovery             | Catalog-grounded shopping advisor                                 | Planned (M3)                                                                                 |
-| AI-assisted catalog content          | Draft → review → approve workflow                                 | Planned (M3)                                                                                 |
-| Store redesign / CRO                 | Upgrade Lab before/after comparisons                              | Planned (M2)                                                                                 |
+| If you need…                         | Try this in Mero & Moss                                           | Status                                                                        |
+| ------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| A new or modernized online store     | Storefront browsing, filters, variants, cart, simulated checkout  | Done (M1): browse → cart → simulated checkout → order in the merchant console |
+| Order operations without manual work | Order events, routing, retries and replay in the merchant console | Planned (M2)                                                                  |
+| Better product discovery             | Catalog-grounded shopping advisor                                 | Planned (M3)                                                                  |
+| AI-assisted catalog content          | Draft → review → approve workflow                                 | Planned (M3)                                                                  |
+| Store redesign / CRO                 | Upgrade Lab before/after comparisons                              | Planned (M2)                                                                  |
 
 See [TASKS.md](TASKS.md) for the live roadmap and the status of each item.
 
@@ -29,6 +29,18 @@ npm run db:reset       # recreate the local demo database from seed data
 ```
 
 Copy `.env.example` to `.env.local` to override defaults. No variables are required for DEMO mode.
+
+## Merchant console
+
+Open [/admin](http://localhost:3000/admin) to manage simulated orders: list and filter them, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks).
+
+Without configuration the console uses a **public demo login**, shown on the login page:
+
+| Email                          | Password         |
+| ------------------------------ | ---------------- |
+| `merchant@meroandmoss.example` | `moss-demo-2026` |
+
+To use your own credentials, set `MERCHANT_EMAIL` and `MERCHANT_PASSWORD_HASH` (generate the hash with `npm run merchant:hash -- "<password>"`). The demo login is then disabled.
 
 ## Scripts
 
