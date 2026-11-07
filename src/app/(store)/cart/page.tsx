@@ -138,6 +138,18 @@ async function CartContents() {
             Add {formatMoney(totals.freeShippingRemaining)} more for free standard shipping.
           </p>
         )}
+        {cart.hasIssues ? (
+          <p className="mt-6 text-sm text-clay" role="note">
+            Please update or remove the items marked above before checking out.
+          </p>
+        ) : (
+          <Link
+            href="/checkout"
+            className="mt-6 block rounded-full bg-ink px-6 py-3 text-center text-sm font-medium text-paper hover:bg-moss"
+          >
+            Continue to checkout
+          </Link>
+        )}
         <p className="mt-4 text-xs leading-relaxed text-muted">
           Shipping is estimated from our{" "}
           <Link href="/#shipping" className="underline underline-offset-2">
