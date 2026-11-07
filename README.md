@@ -13,7 +13,7 @@ Mero & Moss is a working e-commerce product for a direct-to-consumer home and ev
 | A new or modernized online store     | Storefront browsing, filters, variants, cart, simulated checkout  | Done (M1): browse → cart → simulated checkout → order in the merchant console |
 | Order operations without manual work | Order events, routing, retries and replay in the merchant console | Done (#9): durable outbox, worker, job inspector                              |
 | Better product discovery             | Catalog-grounded shopping advisor                                 | Done (#11): works with no API key; optional validated LLM wording             |
-| AI-assisted catalog content          | Draft → review → approve workflow                                 | Planned (M3)                                                                  |
+| AI-assisted catalog content          | Draft → review → approve workflow                                 | Done (#12): versioned drafts, factual checks, audited demo publish            |
 | Store redesign / CRO                 | Upgrade Lab before/after comparisons                              | Planned (M2)                                                                  |
 
 See [TASKS.md](TASKS.md) for the live roadmap and the status of each item.
@@ -48,6 +48,7 @@ Open [/admin](http://localhost:3000/admin) to:
 - **Products:** edit title, copy, status, price, compare-at price and stock per variant. Changes reach the storefront, cart and checkout on the next request, and every changed field is recorded in the product's change history.
 - **Automations:** every order writes an `order.created` event in the same transaction as the order. A worker routes it to a ship zone, flags high-value and bulk orders for review, and records notification previews. **Nothing is sent.** The job log shows each event's status, attempts, redacted payload and previews. Replay is idempotent, failures retry with bounded exponential backoff (10 s, 20 s, 40 s, 1 min 20 s), and the event moves to a dead letter queue after 5 attempts. Two labelled failure drills show retries and dead-lettering on demand.
 - **Requests:** "Talk to a person" requests from the shopping advisor, plus the advisor's assisted-wording integration state.
+- **Content Studio** (from any product's editor): generate a proposed title, summary and SEO description from the product facts, inspect a word-level diff against the live copy, edit it (each save is a new version), and approve or reject it. Without `ANTHROPIC_API_KEY`, drafts are clearly labelled **rules-based** and assembled only from the facts; with a key, Claude (`claude-opus-5-5` by default, `CONTENT_MODEL` to override) drafts via structured output and falls back to rules on any failure. Every draft, whatever its source, must pass factual checks before approval: no prices, no numbers, percentages or materials that are not in the facts, no promotional or unverifiable claims, and length limits. Approval refuses drafts based on an older version of the product, updates the demo catalog only, and records each changed field in the change history. The storefront uses the SEO description as the page's meta description.
 
 Without configuration the console uses a **public demo login**, shown on the login page:
 

@@ -250,4 +250,33 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX support_requests_created_idx ON support_requests(created_at);
     `,
   },
+  {
+    version: 8,
+    name: "content_studio",
+    sql: `
+      ALTER TABLE products ADD COLUMN seo_description TEXT NOT NULL DEFAULT '';
+
+      -- Versioned copy proposals. Approval writes to the demo catalog and the audit log.
+      CREATE TABLE content_drafts (
+        id              TEXT PRIMARY KEY,
+        product_id      TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+        version         INTEGER NOT NULL CHECK (version > 0),
+        source          TEXT NOT NULL CHECK (source IN ('rules', 'ai', 'edited')),
+        model           TEXT,
+        source_note     TEXT NOT NULL DEFAULT '',
+        title           TEXT NOT NULL,
+        summary         TEXT NOT NULL,
+        seo_description TEXT NOT NULL,
+        status          TEXT NOT NULL DEFAULT 'pending'
+                          CHECK (status IN ('pending', 'approved', 'rejected', 'superseded')),
+        base_updated_at TEXT NOT NULL,
+        created_by      TEXT NOT NULL,
+        created_at      TEXT NOT NULL,
+        decided_by      TEXT,
+        decided_at      TEXT,
+        UNIQUE (product_id, version)
+      );
+      CREATE INDEX content_drafts_product_idx ON content_drafts(product_id, version);
+    `,
+  },
 ];

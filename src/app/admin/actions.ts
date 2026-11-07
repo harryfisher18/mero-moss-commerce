@@ -8,6 +8,7 @@ import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
 import { safeAdminPath } from "@/domain/merchant/navigation";
 import { automationService } from "@/server/automation";
+import { contentStudio } from "@/server/content-studio";
 import {
   endMerchantSession,
   merchantAuth,
@@ -288,5 +289,117 @@ export async function operateEvent(
         status: "success",
         message: `Attempt ${result.attempts} failed. The event is in the dead letter queue.`,
       };
+  }
+}
+
+export interface ContentActionState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+}
+
+const productIdSchema = z.object({ productId: z.string().min(1).max(100) });
+
+export async function generateContentDraft(
+  _previous: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  const session = await requireMerchant();
+  const input = productIdSchema.safeParse({ productId: formData.get("productId") });
+  if (!input.success) return { status: "error", message: "That request was not valid." };
+  const result = await contentStudio().generate(input.data.productId, session.email);
+  if (!result.ok) return { status: "error", message: "This product no longer exists." };
+  return {
+    status: "success",
+    message: `Draft version ${String(result.draft.version)} is ready for review. Nothing has been published.`,
+  };
+}
+
+const draftEditSchema = z.object({
+  draftId: z.string().min(1).max(100),
+  title: z.string().max(1000),
+  summary: z.string().max(1000),
+  seoDescription: z.string().max(1000),
+});
+
+export async function saveContentDraft(
+  _previous: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  const session = await requireMerchant();
+  const input = draftEditSchema.safeParse(
+    Object.fromEntries(
+      ["draftId", "title", "summary", "seoDescription"].map((key) => [
+        key,
+        formData.get(key) ?? "",
+      ]),
+    ),
+  );
+  if (!input.success) return { status: "error", message: "That draft could not be read." };
+  const { draftId, ...fields } = input.data;
+  const result = contentStudio().edit(draftId, fields, session.email);
+  if (!result.ok) {
+    return {
+      status: "error",
+      message:
+        result.reason === "not_pending"
+          ? "This draft has already been decided or replaced. Reload to see the latest version."
+          : "That draft could not be saved.",
+    };
+  }
+  return {
+    status: "success",
+    message: `Saved as version ${String(result.draft.version)}. The checks below reflect your changes.`,
+  };
+}
+
+const decisionSchema = z.object({
+  draftId: z.string().min(1).max(100),
+  decision: z.enum(["approve", "reject"]),
+});
+
+export async function decideContentDraft(
+  _previous: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  const session = await requireMerchant();
+  const input = decisionSchema.safeParse({
+    draftId: formData.get("draftId"),
+    decision: formData.get("decision"),
+  });
+  if (!input.success) return { status: "error", message: "That request was not valid." };
+  const studio = contentStudio();
+  if (input.data.decision === "reject") {
+    const result = studio.reject(input.data.draftId, session.email);
+    return result.ok
+      ? { status: "success", message: "Draft rejected. The live copy is unchanged." }
+      : { status: "error", message: "This draft has already been decided or replaced." };
+  }
+  const result = studio.approve(input.data.draftId, session.email);
+  if (result.ok) {
+    const count = result.changedFields.length;
+    return {
+      status: "success",
+      message:
+        count === 0
+          ? "Approved. The draft matched the live copy, so nothing changed."
+          : `Approved and published to the demo catalog: ${String(count)} ${count === 1 ? "field" : "fields"} updated and recorded in the change history.`,
+    };
+  }
+  switch (result.reason) {
+    case "violations":
+      return {
+        status: "error",
+        message: "This draft fails the factual checks. Fix the flagged copy, then approve.",
+      };
+    case "stale":
+      return {
+        status: "error",
+        message:
+          "The product changed after this draft was created. Generate a new draft from the current product.",
+      };
+    case "not_pending":
+      return { status: "error", message: "This draft has already been decided or replaced." };
+    case "not_found":
+      return { status: "error", message: "This draft no longer exists." };
   }
 }

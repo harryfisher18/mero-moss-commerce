@@ -18,6 +18,7 @@ const FIELD_LABELS: Record<string, string> = {
   title: "Title",
   summary: "Summary",
   description: "Description",
+  seoDescription: "SEO description",
   status: "Status",
   price: "Price",
   compareAtPrice: "Compare-at price",
@@ -59,6 +60,12 @@ async function EditProduct({ params }: { params: Promise<{ id: string }> }) {
             View in store
           </Link>
         )}
+        <Link
+          href={`/admin/products/${product.id}/content`}
+          className="text-sm underline underline-offset-2"
+        >
+          Content Studio
+        </Link>
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_20rem]">
