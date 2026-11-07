@@ -24,6 +24,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - `refresh()` from `next/cache` did not re-render the page after a DB-only mutation, so I switched to the documented client `router.refresh()`.
   - `revalidatePath("/", "layout")` exposed a latent prerender error in the `/collections/[handle]` shell. Filed as #23 (P1), and no current code path triggers it.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (8 files, 82 tests) · `npm run build` pass · `npm run test:e2e` pass (28 tests: 14 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/24
 - **Next:** #5, demo checkout creating simulated orders with atomic inventory decrement.
 
 ## 2026-11-07: Repository settings (M0)
