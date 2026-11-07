@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { EventStatusBadge } from "@/components/admin/event-status-badge";
 import { OrderStatusActions } from "@/components/admin/order-status-actions";
 import { OrderStatusBadge } from "@/components/admin/order-status-badge";
 import { formatMoney } from "@/domain/commerce/money";
 import { SHIPPING_REGIONS } from "@/domain/commerce/order";
 import { allowedTransitions, STATUS_LABELS } from "@/domain/commerce/order-status";
+import { tagLabel } from "@/domain/events/order-created";
+import { EVENT_TYPE_LABELS } from "@/domain/events/outbox";
+import { automationService } from "@/server/automation";
 import { merchantOrders, requireMerchant } from "@/server/merchant-session";
 
 export const metadata: Metadata = { title: "Order detail" };
@@ -36,6 +40,7 @@ async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
   const result = merchantOrders().get(id);
   if (!result) notFound();
   const { order, events } = result;
+  const automation = automationService().forOrder(order.id);
   const address = order.shippingAddress;
 
   return (
@@ -111,6 +116,47 @@ async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
               orderId={order.id}
               targets={[...allowedTransitions(order.status)]}
             />
+          </section>
+
+          <section
+            aria-labelledby="automation-heading"
+            className="rounded-sm border border-line bg-white p-4 text-sm"
+            data-testid="order-automation"
+          >
+            <h2 id="automation-heading" className="font-medium">
+              Automation
+            </h2>
+            {automation.tags.length > 0 ? (
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {automation.tags.map((tag) => (
+                  <li
+                    key={tag.tag}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      tag.tag.startsWith("review:")
+                        ? "bg-clay/15 text-clay"
+                        : "bg-moss/15 text-moss"
+                    }`}
+                  >
+                    {tagLabel(tag.tag)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-muted">Not routed yet.</p>
+            )}
+            <ul className="mt-3 space-y-1">
+              {automation.events.map((event) => (
+                <li key={event.id} className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href={`/admin/automations/${event.id}`}
+                    className="underline underline-offset-2"
+                  >
+                    {EVENT_TYPE_LABELS[event.type]} event
+                  </Link>
+                  <EventStatusBadge status={event.status} attempts={event.attempts} />
+                </li>
+              ))}
+            </ul>
           </section>
 
           <section

@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ORDER_STATUSES } from "@/domain/commerce/order";
 import type { RawProductEdit } from "@/domain/commerce/product-edit";
+import { drillPayloadSchema } from "@/domain/events/outbox";
+import { formatDelay } from "@/domain/events/retry-policy";
 import { safeAdminPath } from "@/domain/merchant/navigation";
+import { automationService } from "@/server/automation";
 import {
   endMerchantSession,
   merchantAuth,
@@ -199,4 +202,91 @@ export async function saveProduct(
     errors: {},
     values: null,
   };
+}
+
+export interface AutomationActionState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+}
+
+/** Used with useActionState; it does not need the previous state. */
+export async function runDueJobs(): Promise<AutomationActionState> {
+  await requireMerchant();
+  const summary = automationService().runDue();
+  if (summary.processed === 0) return { status: "success", message: "No jobs were due." };
+  return {
+    status: "success",
+    message: `Processed ${summary.processed} ${summary.processed === 1 ? "event" : "events"}: ${summary.succeeded} succeeded, ${summary.retrying} scheduled for retry, ${summary.dead} dead-lettered.`,
+  };
+}
+
+export async function startAutomationDrill(
+  _previous: AutomationActionState,
+  formData: FormData,
+): Promise<AutomationActionState> {
+  await requireMerchant();
+  const input = drillPayloadSchema.safeParse({ scenario: formData.get("scenario") });
+  if (!input.success) return { status: "error", message: "That drill does not exist." };
+  const eventId = automationService().startDrill(input.data.scenario);
+  redirect(`/admin/automations/${eventId}`);
+}
+
+const eventOperationSchema = z.object({
+  eventId: z.string().min(1).max(100),
+  operation: z.enum(["replay", "retry_now"]),
+});
+
+export async function operateEvent(
+  _previous: AutomationActionState,
+  formData: FormData,
+): Promise<AutomationActionState> {
+  await requireMerchant();
+  const input = eventOperationSchema.safeParse({
+    eventId: formData.get("eventId"),
+    operation: formData.get("operation"),
+  });
+  if (!input.success) return { status: "error", message: "That request was not valid." };
+
+  const service = automationService();
+  const result =
+    input.data.operation === "replay"
+      ? service.replay(input.data.eventId)
+      : service.retryNow(input.data.eventId);
+  if (!result.ok) {
+    return {
+      status: "error",
+      message:
+        result.reason === "not_found"
+          ? "This event no longer exists."
+          : "That action is not available for this event's current status.",
+    };
+  }
+  switch (result.outcome) {
+    case "duplicate":
+      return {
+        status: "success",
+        message: "Replayed. No new effects: this event's tags and previews already exist.",
+      };
+    case "succeeded":
+      return {
+        status: "success",
+        message:
+          input.data.operation === "replay"
+            ? `Replayed and restored ${result.effects} missing ${result.effects === 1 ? "effect" : "effects"}.`
+            : `Attempt ${result.attempts} succeeded.`,
+      };
+    case "failed":
+      return {
+        status: "success",
+        message:
+          result.delayMs === null
+            ? "The replay failed. The event's earlier result is unchanged."
+            : `Attempt ${result.attempts} failed. The next automatic attempt is in ${formatDelay(result.delayMs)}.`,
+      };
+    case "dead":
+      return {
+        status: "success",
+        message: `Attempt ${result.attempts} failed. The event is in the dead letter queue.`,
+      };
+  }
 }
