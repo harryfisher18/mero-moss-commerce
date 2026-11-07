@@ -16,7 +16,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Product detail page with variant selection, availability and stored policies (#3)
 - [x] Cart with persisted state, quantity edits, stock validation and totals in minor units (#4)
 - [ ] Collection page shell must survive path revalidation (#23, P1 bug found during #4)
-- [ ] Demo checkout that creates simulated orders and decrements inventory atomically (#5)
+- [x] Demo checkout that creates simulated orders and decrements inventory atomically (#5)
 - [ ] Merchant authentication and orders console (`/admin/orders`) (#6)
 - [ ] Playwright E2E for Journey 1 (shopper to order) running in CI (#7). Playwright infrastructure and the CI job landed with #2; the full journey spec remains
 
