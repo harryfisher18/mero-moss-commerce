@@ -158,4 +158,24 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX order_status_events_order_idx ON order_status_events(order_id, id);
     `,
   },
+  {
+    version: 5,
+    name: "catalog_audit",
+    sql: `
+      -- One row per changed field. Values are stored as display strings (prices as decimals).
+      CREATE TABLE catalog_audit_events (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_id  TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+        entity_type TEXT NOT NULL CHECK (entity_type IN ('product', 'variant')),
+        entity_id   TEXT NOT NULL,
+        label       TEXT NOT NULL,
+        field       TEXT NOT NULL,
+        before      TEXT NOT NULL,
+        after       TEXT NOT NULL,
+        actor       TEXT NOT NULL,
+        created_at  TEXT NOT NULL
+      );
+      CREATE INDEX catalog_audit_product_idx ON catalog_audit_events(product_id, id);
+    `,
+  },
 ];

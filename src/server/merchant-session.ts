@@ -8,6 +8,7 @@ import {
   type MerchantSession,
 } from "@/server/merchant-auth-service";
 import { MerchantOrderService } from "@/server/merchant-order-service";
+import { ProductEditService } from "@/server/product-edit-service";
 
 export function merchantAuth(): MerchantAuthService {
   return new MerchantAuthService(getDatabase());
@@ -15,6 +16,10 @@ export function merchantAuth(): MerchantAuthService {
 
 export function merchantOrders(): MerchantOrderService {
   return new MerchantOrderService(getDatabase());
+}
+
+export function productEditor(): ProductEditService {
+  return new ProductEditService(getDatabase());
 }
 
 export async function readMerchantSession(): Promise<MerchantSession | null> {

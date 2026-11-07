@@ -62,3 +62,32 @@ export function formatMoney(value: Money, locale = "en-US"): string {
   const fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2;
   return formatter.format(value.amountMinor / 10 ** fractionDigits);
 }
+
+/** Largest price a merchant may enter, in minor units ($99,999.99). */
+export const MAX_PRICE_MINOR = 9_999_999;
+
+/**
+ * Parses merchant-entered amounts such as "48", "48.5", "$1,048.50" into integer minor
+ * units without floating-point arithmetic. Returns null for anything else, including
+ * negative values, more than two decimals, or amounts above MAX_PRICE_MINOR.
+ */
+export function parseMoneyInput(text: string, currency: CurrencyCode): Money | null {
+  const cleaned = text
+    .trim()
+    .replace(/^\$/, "")
+    .replace(/,(?=\d{3}(\D|$))/g, "");
+  const match = /^(\d{1,7})(?:\.(\d{1,2}))?$/.exec(cleaned);
+  if (!match) return null;
+  const whole = Number(match[1]);
+  const fraction = Number((match[2] ?? "").padEnd(2, "0"));
+  const amountMinor = whole * 100 + fraction;
+  if (amountMinor > MAX_PRICE_MINOR) return null;
+  return money(amountMinor, currency);
+}
+
+/** Formats minor units as a plain decimal string for form inputs, e.g. 4850 → "48.50". */
+export function toDecimalString(value: Money): string {
+  const whole = Math.trunc(value.amountMinor / 100);
+  const fraction = String(Math.abs(value.amountMinor % 100)).padStart(2, "0");
+  return `${whole}.${fraction}`;
+}
