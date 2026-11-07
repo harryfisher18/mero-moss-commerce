@@ -29,7 +29,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 ## M3 — Applied AI grounded in commerce data (P0)
 
 - [x] AI Shopping Advisor: catalog-grounded retrieval, budget/compare, deterministic no-key fallback, human escalation, injection safeguards (Journey 4a) (#11)
-- [ ] AI Content Studio: factual product content drafts, diff, merchant approval, demo publish with audit trail (Journey 4b) (#12)
+- [x] AI Content Studio: factual product content drafts, diff, merchant approval, demo publish with audit trail (Journey 4b) (#12)
 
 ## M4 — Analytics, lifecycle and integrations (P1)
 
@@ -47,4 +47,4 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Journey 1 — Shopper to order (#7)
 - [x] Journey 2 — Merchant change propagates (#8, advisor part #11)
 - [x] Journey 3 — Order automation is real (#9; verified Shopify webhook delivery, when configured, follows with #14)
-- [ ] Journey 4 — AI-enhanced business workflow (shopper advisor done in #11; content drafts and approval follow with #12)
+- [x] Journey 4 — AI-enhanced business workflow (#11 advisor, #12 Content Studio)
