@@ -21,6 +21,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Bug found by E2E and fixed:** the ask form was a Suspense fallback that the streamed content replaced, so text typed before streaming finished was lost and an empty question was submitted. The form now renders once outside Suspense, and the answer shows "You asked: …".
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (19 files, 192 tests) · `npm run build` pass · `npm run test:e2e` pass (62 tests: 31 specs × desktop/mobile) · `next dev` smoke check pass with `ANTHROPIC_API_KEY` forced empty (advisor 200 with grounded prices, `/admin/support` 307 to login). No paid API calls were made.
 - **Journey status:** Journey 2 is now complete (the advisor shows the merchant's new price and hides the sold-out variant, E2E). Journey 4 steps 1 and 4 are done; steps 2 and 3 (content drafts and approval) follow with #12.
+- **PR:** [#29](https://github.com/harryfisher18/mero-moss-commerce/pull/29)
 - **Next:** #12, the AI Content Studio (Journey 4b).
 
 ## 2026-11-08: Issue #9, durable order automation (M2, Journey 3)
