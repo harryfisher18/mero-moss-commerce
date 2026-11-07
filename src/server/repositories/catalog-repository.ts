@@ -60,6 +60,7 @@ const productRow = z.object({
   status: z.enum(["active", "draft", "archived"]),
   featured: z.number().int(),
   swatch: z.string(),
+  seo_description: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -272,6 +273,7 @@ export class SqliteCatalogRepository implements CatalogRepository {
       status: row.status,
       featured: row.featured === 1,
       swatch: row.swatch,
+      seoDescription: row.seo_description,
       variants: byProduct.get(row.id) ?? [],
       createdAt: row.created_at,
       updatedAt: row.updated_at,
