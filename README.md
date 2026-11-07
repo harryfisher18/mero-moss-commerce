@@ -8,13 +8,13 @@ Mero & Moss is a working e-commerce product for a direct-to-consumer home and ev
 
 ## What merchants can evaluate
 
-| If you need…                         | Try this in Mero & Moss                                           | Status                                                                          |
-| ------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| A new or modernized online store     | Storefront browsing, filters, variants, cart, simulated checkout  | Catalog, collections and product pages done; cart and checkout in progress (M1) |
-| Order operations without manual work | Order events, routing, retries and replay in the merchant console | Planned (M2)                                                                    |
-| Better product discovery             | Catalog-grounded shopping advisor                                 | Planned (M3)                                                                    |
-| AI-assisted catalog content          | Draft → review → approve workflow                                 | Planned (M3)                                                                    |
-| Store redesign / CRO                 | Upgrade Lab before/after comparisons                              | Planned (M2)                                                                    |
+| If you need…                         | Try this in Mero & Moss                                           | Status                                                                       |
+| ------------------------------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| A new or modernized online store     | Storefront browsing, filters, variants, cart, simulated checkout  | Catalog, collections, product pages and cart done; checkout in progress (M1) |
+| Order operations without manual work | Order events, routing, retries and replay in the merchant console | Planned (M2)                                                                 |
+| Better product discovery             | Catalog-grounded shopping advisor                                 | Planned (M3)                                                                 |
+| AI-assisted catalog content          | Draft → review → approve workflow                                 | Planned (M3)                                                                 |
+| Store redesign / CRO                 | Upgrade Lab before/after comparisons                              | Planned (M2)                                                                 |
 
 See [TASKS.md](TASKS.md) for the live roadmap and the status of each item.
 
