@@ -31,6 +31,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Bug found and fixed:** the rules draft lowercased the first letter of the materials, which would have produced "fSC-certified". Acronyms now keep their case, with a unit test.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (21 files, 211 tests, including "rules drafts pass every check for all 28 seeded products") · `npm run build` pass · `npm run test:e2e` pass (66 tests: 33 specs × desktop/mobile) · `next dev` smoke check with no API key (studio 307 to login; product meta falls back to the summary). No paid API calls were made.
 - **Journey status:** Journey 4 is complete (advisor #11 and Content Studio #12). All four mandatory journeys are now ticked.
+- **PR:** [#30](https://github.com/harryfisher18/mero-moss-commerce/pull/30)
 - **Next:** the P1 backlog. #23 is the open bug (collection shell and revalidation), then #10 (Upgrade Lab) and #13–#17.
 
 ## 2026-11-08: Issue #11, AI Shopping Advisor (M3, Journey 4a)
