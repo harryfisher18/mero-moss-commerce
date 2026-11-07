@@ -3,11 +3,13 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ORDER_STATUSES } from "@/domain/commerce/order";
+import type { RawProductEdit } from "@/domain/commerce/product-edit";
 import { safeAdminPath } from "@/domain/merchant/navigation";
 import {
   endMerchantSession,
   merchantAuth,
   merchantOrders,
+  productEditor,
   requireMerchant,
   startMerchantSession,
 } from "@/server/merchant-session";
@@ -87,4 +89,114 @@ export async function transitionOrder(
     };
   }
   return { status: "success", message: "Order status updated." };
+}
+
+export interface ProductEditState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+  readonly errors: Readonly<Record<string, string>>;
+  /** Submitted values, echoed back on errors so nothing the merchant typed is lost. */
+  readonly values: RawProductEdit | null;
+}
+
+const MAX_VARIANTS = 50;
+const shortText = z.string().max(4000);
+
+export async function saveProduct(
+  _previous: ProductEditState,
+  formData: FormData,
+): Promise<ProductEditState> {
+  const session = await requireMerchant();
+
+  const strings = (name: string) =>
+    formData.getAll(name).map((value) => (typeof value === "string" ? value : ""));
+  const ids = strings("variantId");
+  const prices = strings("price");
+  const compareAts = strings("compareAt");
+  const stocks = strings("stock");
+  const header = z
+    .object({
+      productId: z.string().min(1).max(100),
+      expectedUpdatedAt: z.string().min(1).max(40),
+      title: shortText,
+      summary: shortText,
+      description: shortText,
+      status: z.string().max(20),
+    })
+    .safeParse(
+      Object.fromEntries(
+        ["productId", "expectedUpdatedAt", "title", "summary", "description", "status"].map(
+          (key) => [key, formData.get(key) ?? ""],
+        ),
+      ),
+    );
+  const shapeOk =
+    header.success &&
+    ids.length > 0 &&
+    ids.length <= MAX_VARIANTS &&
+    [prices, compareAts, stocks].every((list) => list.length === ids.length);
+  if (!header.success || !shapeOk) {
+    return {
+      status: "error",
+      message: "This form was incomplete. Reload the page and try again.",
+      errors: {},
+      values: null,
+    };
+  }
+
+  const raw: RawProductEdit = {
+    title: header.data.title,
+    summary: header.data.summary,
+    description: header.data.description,
+    status: header.data.status,
+    variants: ids.map((id, index) => ({
+      id,
+      price: prices[index] ?? "",
+      compareAt: compareAts[index] ?? "",
+      stock: stocks[index] ?? "",
+    })),
+  };
+
+  const result = productEditor().save(
+    header.data.productId,
+    header.data.expectedUpdatedAt,
+    raw,
+    session.email,
+  );
+  if (!result.ok) {
+    switch (result.reason) {
+      case "invalid":
+        return {
+          status: "error",
+          message: "Please fix the highlighted fields.",
+          errors: result.errors,
+          values: raw,
+        };
+      case "conflict":
+        return {
+          status: "error",
+          message:
+            "This product was changed after you opened it. Reload to see the latest version, then reapply your edits.",
+          errors: {},
+          values: raw,
+        };
+      case "not_found":
+        return {
+          status: "error",
+          message: "This product no longer exists.",
+          errors: {},
+          values: null,
+        };
+    }
+  }
+  const count = result.changes.length;
+  return {
+    status: "success",
+    message:
+      count === 0
+        ? "No changes to save."
+        : `Saved ${count} ${count === 1 ? "change" : "changes"}. The storefront now shows the update.`,
+    errors: {},
+    values: null,
+  };
 }

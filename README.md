@@ -32,7 +32,10 @@ Copy `.env.example` to `.env.local` to override defaults. No variables are requi
 
 ## Merchant console
 
-Open [/admin](http://localhost:3000/admin) to manage simulated orders: list and filter them, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks).
+Open [/admin](http://localhost:3000/admin) to:
+
+- **Orders:** list and filter simulated orders, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks).
+- **Products:** edit title, copy, status, price, compare-at price and stock per variant. Changes reach the storefront, cart and checkout on the next request, and every changed field is recorded in the product's change history.
 
 Without configuration the console uses a **public demo login**, shown on the login page:
 
