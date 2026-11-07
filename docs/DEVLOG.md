@@ -4,6 +4,35 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #12, AI Content Studio (M3, Journey 4b)
+
+- **Previous cycle:** #11 merged as `e5aad66` (PR #29) through auto-merge, after CI caught a mobile nav overflow that was fixed in the same PR.
+- **Issue:** [#12](https://github.com/harryfisher18/mero-moss-commerce/issues/12), product content drafts with a diff, approval and an audited demo publish.
+- **Implemented:**
+  - Domain (`src/domain/content`, pure):
+    - Product facts sheet.
+    - Deterministic rules draft: keeps the title and summary, and builds an SEO description of at most 160 characters from the summary, materials, real option values and category.
+    - Word-level diff.
+    - `checkContent`: length limits; no prices; no numbers, percentages or materials outside the facts; no promotional or unverifiable claims unless the facts state them (for example "FSC-certified").
+  - Migration 8 adds `products.seo_description` and versioned `content_drafts` (pending, approved, rejected, superseded).
+  - `ContentDraftProvider`:
+    - Rules provider, always available and labelled.
+    - Optional `AnthropicContentDraftProvider` (official SDK, structured JSON output, `claude-opus-5-5`, low effort, server-side refusal fallback, 30 s timeout, 10 calls per minute).
+    - `FallbackContentDraftProvider` falls back to rules with a note and records the integration state.
+  - `ContentStudioService`:
+    - generate, reject;
+    - edit, which saves a new version and supersedes the earlier one;
+    - approve, in one transaction: refuses stale drafts and failing checks, updates the catalog and writes one `catalog_audit_events` row per changed field, attributed to the merchant and draft version.
+  - `/admin/products/[id]/content`:
+    - drafting mode and status, the facts panel and generate;
+    - for the latest draft: source label, checks, diff, edit form, and approve (shown only when the checks pass and the draft is current) or reject;
+    - version history.
+  - The product editor links to the studio and labels SEO changes in its history. The storefront product meta description uses the SEO description, falling back to the summary.
+- **Bug found and fixed:** the rules draft lowercased the first letter of the materials, which would have produced "fSC-certified". Acronyms now keep their case, with a unit test.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (21 files, 211 tests, including "rules drafts pass every check for all 28 seeded products") · `npm run build` pass · `npm run test:e2e` pass (66 tests: 33 specs × desktop/mobile) · `next dev` smoke check with no API key (studio 307 to login; product meta falls back to the summary). No paid API calls were made.
+- **Journey status:** Journey 4 is complete (advisor #11 and Content Studio #12). All four mandatory journeys are now ticked.
+- **Next:** the P1 backlog. #23 is the open bug (collection shell and revalidation), then #10 (Upgrade Lab) and #13–#17.
+
 ## 2026-11-08: Issue #11, AI Shopping Advisor (M3, Journey 4a)
 
 - **Previous cycle:** #9 merged as `3f00f1f` (PR #28) through auto-merge.

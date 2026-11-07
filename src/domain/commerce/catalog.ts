@@ -73,6 +73,8 @@ export interface Product {
   readonly featured: boolean;
   /** Primary swatch color (hex) used for product artwork until photography exists. */
   readonly swatch: string;
+  /** Search result / meta description. Empty means "use the summary". */
+  readonly seoDescription: string;
   readonly variants: readonly Variant[];
   readonly createdAt: string;
   readonly updatedAt: string;

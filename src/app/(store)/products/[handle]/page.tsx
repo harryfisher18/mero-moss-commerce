@@ -7,7 +7,9 @@ export async function generateMetadata({
   params,
 }: PageProps<"/products/[handle]">): Promise<Metadata> {
   const product = await getProduct((await params).handle);
-  return product ? { title: product.title, description: product.summary } : {};
+  return product
+    ? { title: product.title, description: product.seoDescription || product.summary }
+    : {};
 }
 
 export default function ProductPage({ params, searchParams }: PageProps<"/products/[handle]">) {
