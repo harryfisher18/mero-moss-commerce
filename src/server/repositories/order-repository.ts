@@ -4,6 +4,9 @@ import {
   ORDER_STATUSES,
   type Order,
   type OrderDraft,
+  type OrderStatus,
+  type OrderStatusEvent,
+  type OrderSummary,
   SHIPPING_REGIONS,
   type ShippingAddress,
 } from "@/domain/commerce/order";
@@ -25,6 +28,10 @@ export interface OrderRepository {
   insert(order: NewOrder): void;
   getByConfirmationToken(token: string): Order | null;
   getById(id: string): Order | null;
+  listSummaries(status?: OrderStatus): OrderSummary[];
+  updateStatus(id: string, status: OrderStatus): void;
+  addStatusEvent(event: OrderStatusEvent & { readonly orderId: string }): void;
+  getStatusEvents(orderId: string): OrderStatusEvent[];
 }
 
 const REGION_CODES = Object.keys(SHIPPING_REGIONS) as [
@@ -49,6 +56,25 @@ const orderRow = z.object({
   subtotal_minor: z.number().int(),
   shipping_minor: z.number().int(),
   total_minor: z.number().int(),
+  created_at: z.string(),
+});
+
+const summaryRow = z.object({
+  id: z.string(),
+  order_number: z.string(),
+  status: z.enum(ORDER_STATUSES),
+  full_name: z.string(),
+  email: z.string(),
+  currency: z.enum(SUPPORTED_CURRENCIES),
+  total_minor: z.number().int(),
+  item_count: z.number().int(),
+  created_at: z.string(),
+});
+
+const eventRow = z.object({
+  from_status: z.enum(ORDER_STATUSES).nullable(),
+  to_status: z.enum(ORDER_STATUSES),
+  actor: z.string(),
   created_at: z.string(),
 });
 
@@ -129,6 +155,60 @@ export class SqliteOrderRepository implements OrderRepository {
   getById(id: string): Order | null {
     const row = this.db.prepare("SELECT * FROM orders WHERE id = ?").get(id);
     return row ? this.toOrder(orderRow.parse(row)) : null;
+  }
+
+  listSummaries(status?: OrderStatus): OrderSummary[] {
+    const sql = `
+      SELECT o.id, o.order_number, o.status, o.full_name, o.email, o.currency, o.total_minor,
+             o.created_at, COALESCE(SUM(l.quantity), 0) AS item_count
+      FROM orders o LEFT JOIN order_lines l ON l.order_id = o.id
+      ${status ? "WHERE o.status = ?" : ""}
+      GROUP BY o.id
+      ORDER BY o.sequence DESC
+      LIMIT 200`;
+    const rows = status ? this.db.prepare(sql).all(status) : this.db.prepare(sql).all();
+    return rows.map((raw) => {
+      const row = summaryRow.parse(raw);
+      return {
+        id: row.id,
+        orderNumber: row.order_number,
+        status: row.status,
+        customerName: row.full_name,
+        email: row.email,
+        itemCount: row.item_count,
+        total: money(row.total_minor, row.currency),
+        createdAt: row.created_at,
+      };
+    });
+  }
+
+  updateStatus(id: string, status: OrderStatus): void {
+    this.db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(status, id);
+  }
+
+  addStatusEvent(event: OrderStatusEvent & { readonly orderId: string }): void {
+    this.db
+      .prepare(
+        "INSERT INTO order_status_events (order_id, from_status, to_status, actor, created_at) VALUES (?, ?, ?, ?, ?)",
+      )
+      .run(event.orderId, event.fromStatus, event.toStatus, event.actor, event.createdAt);
+  }
+
+  getStatusEvents(orderId: string): OrderStatusEvent[] {
+    return this.db
+      .prepare(
+        "SELECT from_status, to_status, actor, created_at FROM order_status_events WHERE order_id = ? ORDER BY id",
+      )
+      .all(orderId)
+      .map((raw) => {
+        const row = eventRow.parse(raw);
+        return {
+          fromStatus: row.from_status,
+          toStatus: row.to_status,
+          actor: row.actor,
+          createdAt: row.created_at,
+        };
+      });
   }
 
   private toOrder(row: z.infer<typeof orderRow>): Order {

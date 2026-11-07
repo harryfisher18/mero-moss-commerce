@@ -125,4 +125,37 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+  {
+    version: 4,
+    name: "merchant_console",
+    sql: `
+      -- Only a SHA-256 digest of each session token is stored; the raw token lives in the cookie.
+      CREATE TABLE merchant_sessions (
+        token_hash TEXT PRIMARY KEY,
+        email      TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL
+      );
+      CREATE INDEX merchant_sessions_expiry_idx ON merchant_sessions(expires_at);
+
+      CREATE TABLE login_attempts (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        email        TEXT NOT NULL,
+        succeeded    INTEGER NOT NULL CHECK (succeeded IN (0, 1)),
+        attempted_at TEXT NOT NULL
+      );
+      CREATE INDEX login_attempts_email_idx ON login_attempts(email, attempted_at);
+
+      CREATE TABLE order_status_events (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id    TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+        from_status TEXT,
+        to_status   TEXT NOT NULL,
+        actor       TEXT NOT NULL,
+        note        TEXT NOT NULL DEFAULT '',
+        created_at  TEXT NOT NULL
+      );
+      CREATE INDEX order_status_events_order_idx ON order_status_events(order_id, id);
+    `,
+  },
 ];

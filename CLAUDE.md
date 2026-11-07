@@ -73,6 +73,7 @@ npm run test:e2e     # Playwright E2E against a production build: run `npm run b
 npm run build        # production build
 npm run check        # lint + typecheck + test + build (what CI runs)
 npm run db:reset     # recreate the local demo database from seed data
+npm run merchant:hash -- "<password>"  # scrypt hash for MERCHANT_PASSWORD_HASH
 ```
 
 Never weaken, skip, or delete checks or tests to get green. Fix the root cause.
