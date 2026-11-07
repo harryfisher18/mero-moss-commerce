@@ -4,6 +4,20 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #23, collection shell survives path revalidation (bug, P1)
+
+- **Previous cycle:** #12 merged as `885fe0f` (PR #30) through auto-merge. All four mandatory journeys are done.
+- **Issue:** [#23](https://github.com/harryfisher18/mero-moss-commerce/issues/23), the collection page shell fails to re-prerender when paths are revalidated.
+- **Reproduced first:** a production build with a temporary `revalidatePath("/", "layout")` in `addToCart` (never committed). After one add-to-cart, `/collections/workspace` and `/collections/all` returned **HTTP 500** with "Route \"/collections/[handle]\": Next.js encountered uncached or runtime data during prerendering". That is worse than the logged error the issue describes.
+- **Fix:**
+  - `CollectionPage` is no longer async. It passes the `params` promise to `CollectionContent` inside `<Suspense>`, with a skeleton fallback, following the Next 16 caching guide.
+  - Known handles are still fully prerendered via `generateStaticParams`: the built `workspace.html` and `all.html` shells contain the real `<h1>`.
+  - `/products/[handle]` already read params inside Suspense and needed no change.
+- **Verified with the same reproduction after the fix:** 200 with the correct `<h1>` for both collections, 404 for an unknown handle, 200 for product pages, and no errors in the server log. The temporary code was then reverted.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (21 files, 211 tests) · `npm run build` pass (collection routes still Partial Prerender) · `npm run test:e2e` pass (66 tests).
+- **Regression coverage:** no product code calls `revalidatePath` (all catalog reads are request-time), so a permanent automated test would need speculative revalidation. The manual reproduction above is documented in the PR instead.
+- **Next:** #10, Upgrade Lab (P1).
+
 ## 2026-11-08: Issue #12, AI Content Studio (M3, Journey 4b)
 
 - **Previous cycle:** #11 merged as `e5aad66` (PR #29) through auto-merge, after CI caught a mobile nav overflow that was fixed in the same PR.
