@@ -9,6 +9,7 @@ const NAV = [
     label: CATEGORY_DEFINITIONS[handle].title,
   })),
   { href: "/#policies", label: "Shipping & returns" },
+  { href: "/advisor", label: "Ask an advisor" },
 ];
 
 export function StoreHeader() {

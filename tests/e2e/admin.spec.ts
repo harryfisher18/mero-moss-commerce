@@ -26,6 +26,11 @@ test.describe("merchant console", () => {
 
     await signInAsMerchant(page);
     await expect(page.getByRole("heading", { level: 1, name: "Orders" })).toBeVisible();
+    // The console header must fit the viewport (no horizontal page scroll on phones).
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    await expect(page.getByRole("button", { name: "Sign out" })).toBeInViewport();
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/admin\/login$/);
     await page.goto("/admin/orders");

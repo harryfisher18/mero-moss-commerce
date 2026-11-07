@@ -11,8 +11,8 @@ Mero & Moss is a working e-commerce product for a direct-to-consumer home and ev
 | If you need…                         | Try this in Mero & Moss                                           | Status                                                                        |
 | ------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | A new or modernized online store     | Storefront browsing, filters, variants, cart, simulated checkout  | Done (M1): browse → cart → simulated checkout → order in the merchant console |
-| Order operations without manual work | Order events, routing, retries and replay in the merchant console | Planned (M2)                                                                  |
-| Better product discovery             | Catalog-grounded shopping advisor                                 | Planned (M3)                                                                  |
+| Order operations without manual work | Order events, routing, retries and replay in the merchant console | Done (#9): durable outbox, worker, job inspector                              |
+| Better product discovery             | Catalog-grounded shopping advisor                                 | Done (#11): works with no API key; optional validated LLM wording             |
 | AI-assisted catalog content          | Draft → review → approve workflow                                 | Planned (M3)                                                                  |
 | Store redesign / CRO                 | Upgrade Lab before/after comparisons                              | Planned (M2)                                                                  |
 
@@ -31,6 +31,15 @@ npm run worker         # optional: background worker that runs scheduled automat
 
 Copy `.env.example` to `.env.local` to override defaults. No variables are required for DEMO mode.
 
+## Shopping advisor
+
+Open [/advisor](http://localhost:3000/advisor) (also linked from the header, product pages and the cart). Ask things like "travel gifts under $50", "linen storage bin in Oat", "compare the felt desk mat and the oak monitor stand" or "what is your return policy?".
+
+- **Grounded by design.** A deterministic parser turns the question into budget, category, option and keyword constraints. Retrieval returns only active, in-stock variants, and every card links to the exact variant at its current price and stock. Policies are quoted word for word from the stored policy text. Sold-out matches are reported, not hidden, and the advisor never invents discounts, codes or policies.
+- **No key needed.** Without `ANTHROPIC_API_KEY` the advisor is fully functional on catalog rules (state `DEMO`).
+- **Optional assisted wording.** With a key set, the advisor asks Claude (`claude-opus-5-5` by default, overridable with `ADVISOR_MODEL`) to reword the same validated facts. The reply is rejected, and the catalog wording shown instead, if it introduces any price not in the facts, a percentage, a code, a link, contact details or an unsupported "free" claim, or if the call fails, times out or is refused. The integration state (`DEMO`, `CONFIGURED`, `CONNECTED_VERIFIED`, `ERROR`) comes from real calls only and is shown to merchants.
+- **Human escalation.** "Talk to a person" saves the shopper's email, message and advisor question for the shop team. No email is sent.
+
 ## Merchant console
 
 Open [/admin](http://localhost:3000/admin) to:
@@ -38,6 +47,7 @@ Open [/admin](http://localhost:3000/admin) to:
 - **Orders:** list and filter simulated orders, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks).
 - **Products:** edit title, copy, status, price, compare-at price and stock per variant. Changes reach the storefront, cart and checkout on the next request, and every changed field is recorded in the product's change history.
 - **Automations:** every order writes an `order.created` event in the same transaction as the order. A worker routes it to a ship zone, flags high-value and bulk orders for review, and records notification previews. **Nothing is sent.** The job log shows each event's status, attempts, redacted payload and previews. Replay is idempotent, failures retry with bounded exponential backoff (10 s, 20 s, 40 s, 1 min 20 s), and the event moves to a dead letter queue after 5 attempts. Two labelled failure drills show retries and dead-lettering on demand.
+- **Requests:** "Talk to a person" requests from the shopping advisor, plus the advisor's assisted-wording integration state.
 
 Without configuration the console uses a **public demo login**, shown on the login page:
 
