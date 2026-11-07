@@ -82,6 +82,13 @@ export class OrderService {
             throw new StockChangedError(line.variantId);
           }
         }
+        this.orders.addStatusEvent({
+          orderId: id,
+          fromStatus: null,
+          toStatus: "placed",
+          actor: "Shopper (storefront checkout)",
+          createdAt: this.now(),
+        });
         this.carts.delete(cartId);
 
         const order = this.orders.getById(id);
