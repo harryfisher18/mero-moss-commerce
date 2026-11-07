@@ -21,6 +21,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - The cart page offers "Continue to checkout" only when every line can be fulfilled.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (10 files, 98 tests, incl. two-shopper oversell, partial-stock rollback, guarded decrement, schema-level simulated-only) · `npm run build` pass · `npm run test:e2e` pass (36 tests: 18 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass.
 - **Journey 1 status:** browse → filter → product → variant → cart → quantity → simulated checkout → confirmation works end to end. The remaining step, "order visible in the merchant console", is #6.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/25
 - **Next:** #6, merchant authentication and orders console.
 
 ## 2026-11-07: Issue #4, cart (M1)
