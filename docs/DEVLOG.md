@@ -20,6 +20,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Propagation:** storefront, cart and checkout read the catalog at request time, so edits appear on the next request with no cache invalidation. That also means #23 is not triggered.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (14 files, 128 tests) · `npm run build` pass · `npm run test:e2e` pass (48 tests: 24 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass (editor routes 307 to login when signed out).
 - **Journey 2 status:** the storefront and cart parts are done and E2E-proven. The "AI assistant reflects new values" part depends on the advisor (#11), which will read the same request-time catalog.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/27
 - **Next:** #9, the durable order event outbox and worker (Journey 3).
 
 ## 2026-11-07: Issues #6 + #7, merchant console and Journey 1 E2E (M1)
