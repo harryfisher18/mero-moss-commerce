@@ -8,6 +8,7 @@ export interface CartRepository {
   getLines(cartId: string): CartLine[];
   /** Replaces all lines of a cart, preserving the given order. */
   saveLines(cartId: string, lines: readonly CartLine[], now: string): void;
+  delete(cartId: string): void;
 }
 
 const lineRow = z.object({ variant_id: z.string(), quantity: z.number().int().positive() });
@@ -42,5 +43,9 @@ export class SqliteCartRepository implements CartRepository {
     );
     lines.forEach((line, index) => insert.run(cartId, line.variantId, line.quantity, index));
     this.db.prepare("UPDATE carts SET updated_at = ? WHERE id = ?").run(now, cartId);
+  }
+
+  delete(cartId: string): void {
+    this.db.prepare("DELETE FROM carts WHERE id = ?").run(cartId);
   }
 }

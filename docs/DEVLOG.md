@@ -4,6 +4,25 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-07: Issue #5, demo checkout (M1)
+
+- **Previous cycle:** #4 merged as `bd29929` (PR #24) through auto-merge. Both checks were green on main.
+- **Issue:** [#5](https://github.com/harryfisher18/mero-moss-commerce/issues/5), the demo checkout that creates simulated orders and decrements inventory atomically.
+- **Implemented:**
+  - Pure `order` domain:
+    - zod checkout details: email, name, contiguous-US address (48 states plus DC, matching the shipping policy), and ZIP or ZIP+4.
+    - A required simulated-order acknowledgement.
+    - `buildOrderDraft` **rejects** (never caps) unavailable, sold-out or over-stock lines.
+    - Sequential `MM-1xxxxx` order numbers.
+  - Migration 3 adds `orders` and `order_lines`, with price and title snapshots, `CHECK (is_simulated = 1)`, status values and a unique random confirmation token.
+  - `OrderService.placeOrder` runs one `BEGIN IMMEDIATE` transaction: re-read cart and live stock, validate, insert order and lines, decrement inventory with a guarded `UPDATE ... WHERE inventory_quantity >= ?`, delete the cart. Any failure rolls back.
+  - `/checkout` has a prominent "Simulated order · No payment" disclosure and **no payment fields**. Server-validated field errors use `aria-invalid` and `aria-describedby`, typed values are kept, and checkout is blocked while the cart has issues.
+  - `/checkout/confirmation` resolves from an httpOnly, `path=/checkout` cookie token (24 h), so there are no enumerable order URLs and no PII in URLs. The cart cookie is cleared on success.
+  - The cart page offers "Continue to checkout" only when every line can be fulfilled.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (10 files, 98 tests, incl. two-shopper oversell, partial-stock rollback, guarded decrement, schema-level simulated-only) · `npm run build` pass · `npm run test:e2e` pass (36 tests: 18 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass.
+- **Journey 1 status:** browse → filter → product → variant → cart → quantity → simulated checkout → confirmation works end to end. The remaining step, "order visible in the merchant console", is #6.
+- **Next:** #6, merchant authentication and orders console.
+
 ## 2026-11-07: Issue #4, cart (M1)
 
 - **Previous cycles:** #3 merged as `5de39b6` (PR #20). PR #21 (`88db869`) adds the mentor co-author trailer. PR #22 (`27eada1`) was the first auto-merge through the protected `main`.
