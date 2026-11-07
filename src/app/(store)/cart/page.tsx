@@ -161,6 +161,12 @@ async function CartContents() {
           times are estimates. This is a demo store: no tax is calculated and no payment is ever
           taken.
         </p>
+        <p className="mt-4 text-sm">
+          Need help choosing?{" "}
+          <Link href="/advisor" className="underline underline-offset-2">
+            Ask our shopping advisor
+          </Link>
+        </p>
       </aside>
     </div>
   );
