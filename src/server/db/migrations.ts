@@ -62,4 +62,23 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+  {
+    version: 2,
+    name: "carts",
+    sql: `
+      CREATE TABLE carts (
+        id         TEXT PRIMARY KEY,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE cart_lines (
+        cart_id    TEXT NOT NULL REFERENCES carts(id) ON DELETE CASCADE,
+        variant_id TEXT NOT NULL,
+        quantity   INTEGER NOT NULL CHECK (quantity > 0),
+        position   INTEGER NOT NULL,
+        PRIMARY KEY (cart_id, variant_id)
+      );
+    `,
+  },
 ];
