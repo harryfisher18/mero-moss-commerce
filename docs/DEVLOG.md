@@ -4,6 +4,24 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-07: Issue #8, merchant product editor (M2, Journey 2)
+
+- **Previous cycle:** #6 and #7 merged as `2eddbeb` (PR #26) through auto-merge. M1 is complete.
+- **Issue:** [#8](https://github.com/harryfisher18/mero-moss-commerce/issues/8), the merchant product editor that propagates to the storefront with an audit log.
+- **Implemented:**
+  - Domain:
+    - `parseMoneyInput` reads merchant input like "48", "48.5" or "$1,048.50" exactly into minor units with no floats, capped at $99,999.99. `toDecimalString` goes the other way.
+    - `parseProductEdit` validates text fields, status and every variant's price, compare-at (must be above the price) and stock (0–100,000), and requires exactly the product's variants. Errors are reported per field.
+    - `diffProductEdit` produces one audit change per modified field.
+  - Migration 5 adds `catalog_audit_events`.
+  - `ProductEditService.save` runs in one transaction with optimistic concurrency on `updated_at`, so stale forms are rejected rather than overwriting newer edits. It writes the product and variants and records an audit row per changed field. Unchanged forms are a no-op.
+  - `/admin/products` lists every product with status, category, variants, stock and price range. `/admin/products/[id]` is the editor: per-field errors with `aria-invalid` and `aria-describedby`, submitted values echoed back on error, remount after save, and a change history showing before → after, actor and time. A "View in store" link shows for active products. The console nav gains a Products link.
+  - The `saveProduct` Server Action re-verifies the session, validates shape and bounds, and records the merchant's email as the actor.
+- **Propagation:** storefront, cart and checkout read the catalog at request time, so edits appear on the next request with no cache invalidation. That also means #23 is not triggered.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (14 files, 128 tests) · `npm run build` pass · `npm run test:e2e` pass (48 tests: 24 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass (editor routes 307 to login when signed out).
+- **Journey 2 status:** the storefront and cart parts are done and E2E-proven. The "AI assistant reflects new values" part depends on the advisor (#11), which will read the same request-time catalog.
+- **Next:** #9, the durable order event outbox and worker (Journey 3).
+
 ## 2026-11-07: Issues #6 + #7, merchant console and Journey 1 E2E (M1)
 
 - **Previous cycle:** #5 merged as `5f0d59c` (PR #25) through auto-merge. Both checks were green on main.

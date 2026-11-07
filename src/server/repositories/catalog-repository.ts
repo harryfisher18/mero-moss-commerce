@@ -32,6 +32,7 @@ export interface CatalogRepository {
    * Returns false (and changes nothing) when stock is insufficient.
    */
   decrementInventory(variantId: string, quantity: number): boolean;
+  getProductById(id: string): Product | null;
   /** Cheap indexed existence check for an active product handle (used before rendering). */
   isActiveProductHandle(handle: string): boolean;
   countActiveProductsByCategory(): Record<CategoryHandle, number>;
@@ -185,6 +186,18 @@ export class SqliteCatalogRepository implements CatalogRepository {
       )
       .run(quantity, variantId, quantity);
     return Number(result.changes) === 1;
+  }
+
+  getProductById(id: string): Product | null {
+    const row = this.db
+      .prepare(
+        `SELECT p.*, c.handle AS category_handle
+         FROM products p JOIN categories c ON c.id = p.category_id
+         WHERE p.id = ?`,
+      )
+      .get(id);
+    if (!row) return null;
+    return this.attachVariants([productRow.parse(row)])[0] ?? null;
   }
 
   isActiveProductHandle(handle: string): boolean {

@@ -40,6 +40,9 @@ async function SignedInNav() {
       <Link href="/admin/orders" className="hover:underline">
         Orders
       </Link>
+      <Link href="/admin/products" className="hover:underline">
+        Products
+      </Link>
       <Link href="/" className="hover:underline">
         View store
       </Link>
