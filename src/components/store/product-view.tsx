@@ -172,6 +172,15 @@ export async function ProductView({
                 </details>
               ))}
           </div>
+          <p className="mt-6 text-sm text-muted">
+            Questions about this piece?{" "}
+            <Link
+              href={`/advisor?q=${encodeURIComponent(product.title)}`}
+              className="text-ink underline underline-offset-2"
+            >
+              Ask our shopping advisor
+            </Link>
+          </p>
         </div>
       </article>
 

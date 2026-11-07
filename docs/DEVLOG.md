@@ -4,6 +4,25 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #11, AI Shopping Advisor (M3, Journey 4a)
+
+- **Previous cycle:** #9 merged as `3f00f1f` (PR #28) through auto-merge.
+- **Issue:** [#11](https://github.com/harryfisher18/mero-moss-commerce/issues/11), the AI Shopping Advisor grounded in catalog data, with a no-key fallback and escalation.
+- **Implemented:**
+  - Domain (`src/domain/advisor`, pure):
+    - Query parsing: budgets in minor units (ranges, ceilings, floors, "around"; units like "30 days" or "750 ml" are not prices), categories, catalog option values, keywords, policy topics, sale, compare and escalation intents.
+    - Deterministic retrieval over active, in-stock variants. Sold-out requests are reported, weak partial matches are pruned, and unmatched keywords are relaxed only when other constraints exist.
+    - Answer composition from catalog rows and stored policy text only.
+    - A wording validator that rejects new prices, percentages, codes, links, contact details and unsupported "free" claims.
+  - Migration 7 adds `support_requests`.
+  - `RecommendationProvider`: `CatalogRecommendationProvider` is the no-key baseline. Optional `AnthropicWordingProvider` (official SDK, `claude-opus-5-5`, low effort, server-side refusal fallback, 15 s timeout, 20 calls per minute) only rewords validated facts. The integration state is tracked from real calls (DEMO, CONFIGURED, CONNECTED_VERIFIED, ERROR).
+  - Storefront `/advisor` with a GET form (works without JavaScript), variant cards at current price and stock, verbatim policy quotes, honest notes and a "Talk to a person" form. It is linked from the header, product pages and the cart.
+  - Merchant `/admin/support` lists requests and shows the advisor integration state.
+- **Bug found by E2E and fixed:** the ask form was a Suspense fallback that the streamed content replaced, so text typed before streaming finished was lost and an empty question was submitted. The form now renders once outside Suspense, and the answer shows "You asked: …".
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (19 files, 192 tests) · `npm run build` pass · `npm run test:e2e` pass (62 tests: 31 specs × desktop/mobile) · `next dev` smoke check pass with `ANTHROPIC_API_KEY` forced empty (advisor 200 with grounded prices, `/admin/support` 307 to login). No paid API calls were made.
+- **Journey status:** Journey 2 is now complete (the advisor shows the merchant's new price and hides the sold-out variant, E2E). Journey 4 steps 1 and 4 are done; steps 2 and 3 (content drafts and approval) follow with #12.
+- **Next:** #12, the AI Content Studio (Journey 4b).
+
 ## 2026-11-08: Issue #9, durable order automation (M2, Journey 3)
 
 - **Previous cycle:** #8 merged as `88e334c` (PR #27) through auto-merge.
