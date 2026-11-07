@@ -4,6 +4,29 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-07: Issue #4, cart (M1)
+
+- **Previous cycles:** #3 merged as `5de39b6` (PR #20). PR #21 (`88db869`) adds the mentor co-author trailer. PR #22 (`27eada1`) was the first auto-merge through the protected `main`.
+- **Issue:** [#4](https://github.com/harryfisher18/mero-moss-commerce/issues/4), the cart with persisted state, quantity edits, stock validation and totals.
+- **Implemented:**
+  - Pure `cart` domain:
+    - Add, set and remove built on `validatePurchase`. The combined quantity per variant is bounded by stock and the per-line cap.
+    - Up to 20 distinct lines per cart.
+    - Pricing in minor units, with per-line issues (unavailable, sold out, quantity reduced) that are excluded from or capped in totals.
+    - Shipping estimate (`SHIPPING_RULE`) checked against the stored shipping policy text. Tax is shown explicitly as not charged.
+  - Migration 2 adds `carts` and `cart_lines`, behind `SqliteCartRepository`.
+  - `CartService` re-reads variants, status and stock and validates inside one `BEGIN IMMEDIATE` transaction. Malformed or unknown cart ids start a new cart, and rejected first adds never create one.
+  - Cart identity is an opaque random UUID in an httpOnly, SameSite=Lax cookie (Secure in production) that lasts 30 days. The client never sends prices.
+  - zod-validated Server Actions for add, update and remove. The client forms use `useActionState` with polite live-region status messages and call `router.refresh()` on success.
+  - Product page: quantity input bounded by stock plus Add to cart. Sold-out options show guidance instead of a dead button.
+  - `/cart` with line edits, issue notes, order summary, estimate caveats, a free-shipping progress note and an empty state. The header shows the cart count, streamed at request time.
+- **Findings:**
+  - `refresh()` from `next/cache` did not re-render the page after a DB-only mutation, so I switched to the documented client `router.refresh()`.
+  - `revalidatePath("/", "layout")` exposed a latent prerender error in the `/collections/[handle]` shell. Filed as #23 (P1), and no current code path triggers it.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (8 files, 82 tests) · `npm run build` pass · `npm run test:e2e` pass (28 tests: 14 specs × desktop/mobile, 0 server errors) · `next dev` smoke check pass.
+- **PR:** https://github.com/harryfisher18/mero-moss-commerce/pull/24
+- **Next:** #5, demo checkout creating simulated orders with atomic inventory decrement.
+
 ## 2026-11-07: Repository settings (M0)
 
 - **Co-author:** PR #21 (merged as `88db869`) makes every commit and squash merge carry a `Co-authored-by` trailer for Dominik Lubański (Dominic6018), the project mentor.

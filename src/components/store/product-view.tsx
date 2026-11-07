@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 import { CATEGORY_DEFINITIONS } from "@/domain/commerce/catalog";
 import {
   availabilityMessage,
+  maxPurchasableQuantity,
   optionStates,
   priceDisplay,
   relatedProducts,
   resolveSelectedVariant,
 } from "@/domain/commerce/variant-selection";
 import { getProduct, getProducts, getStorePolicies } from "@/server/catalog";
+import { AddToCartForm } from "./add-to-cart-form";
 import { ProductArt } from "./product-art";
 import { ProductCard } from "./product-card";
 
@@ -130,6 +132,18 @@ export async function ProductView({
               </div>
             );
           })}
+
+          {soldOut ? (
+            <p className="mt-6 text-sm text-muted">
+              This option is sold out. Please choose another option.
+            </p>
+          ) : (
+            <AddToCartForm
+              key={selected.id}
+              variantId={selected.id}
+              maxQuantity={maxPurchasableQuantity(selected)}
+            />
+          )}
 
           <p className="mt-6 text-xs text-muted">
             SKU <span data-testid="product-sku">{selected.sku}</span>
