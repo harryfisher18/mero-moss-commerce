@@ -88,6 +88,14 @@ test("Journey 2: merchant edits propagate to the storefront and cart", async ({ 
       page.locator("[data-testid=cart-line]:visible").getByTestId("line-total"),
     ).toHaveText("$128.00");
 
+    // The shopping advisor answers from the same live catalog: new price, sold-out black.
+    await page.goto("/advisor?q=brass%20task%20lamp");
+    const advised = page.locator("[data-testid=advisor-card]:visible");
+    await expect(advised).toHaveCount(1);
+    await expect(advised).toHaveAttribute("data-variant-id", BRASS);
+    await expect(advised.getByTestId("advisor-card-price")).toContainText("$128.00");
+    await expect(advised.getByTestId("advisor-card-price")).toContainText("$148.00");
+
     // Unpublishing hides the product from the store (real 404) and its collection.
     await page.goto(`/admin/products/${LAMP}`);
     const editorAgain = visible(page, "product-editor");

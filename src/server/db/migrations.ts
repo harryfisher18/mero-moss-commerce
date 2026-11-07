@@ -235,4 +235,19 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+  {
+    version: 7,
+    name: "support_requests",
+    sql: `
+      -- "Talk to a person" requests from the shopping advisor. Nothing is emailed in DEMO mode.
+      CREATE TABLE support_requests (
+        id         TEXT PRIMARY KEY,
+        email      TEXT NOT NULL,
+        message    TEXT NOT NULL,
+        question   TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL
+      );
+      CREATE INDEX support_requests_created_idx ON support_requests(created_at);
+    `,
+  },
 ];
