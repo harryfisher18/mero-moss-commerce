@@ -4,6 +4,24 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #9, durable order automation (M2, Journey 3)
+
+- **Previous cycle:** #8 merged as `88e334c` (PR #27) through auto-merge.
+- **Issue:** [#9](https://github.com/harryfisher18/mero-moss-commerce/issues/9), the durable order event outbox and worker with retries, idempotency and a job inspector.
+- **Implemented:**
+  - Domain (`src/domain/events`, pure):
+    - `retry-policy`: 5 attempts with bounded exponential backoff (10 s, 20 s, 40 s, 1 min 20 s, capped at 10 min), no jitter so it is testable. Permanent failures dead-letter immediately.
+    - `order-created`: the event payload (no street address), ship-zone routing for every region, review rules (total of $500 or more, 5 or more units in one line), notification previews, and PII redaction for the inspector.
+    - `outbox`: event types, statuses and two labelled failure drills.
+  - Migration 6 adds `outbox_events`, `job_attempts`, `order_tags` and `notification_previews`. Effects have unique keys per event, and previews are constrained to `preview_only` delivery.
+  - `OrderService.placeOrder` writes the `order.created` event inside the order transaction (transactional outbox).
+  - `AutomationService` makes each attempt in one `BEGIN IMMEDIATE` transaction: it re-checks eligibility, runs the handler in a savepoint, then records success, the next retry or the dead letter. A failed attempt leaves no partial effects. Replays and second workers create no duplicate effects.
+  - The worker runs in three places: `after()` once the checkout response is sent, "Run due jobs" in the console, and `npm run worker` for scheduled retries.
+  - `/admin/automations` shows the job log with status filters and counts, the retry policy, "Run due jobs" and the failure drills. `/admin/automations/[id]` shows tags, notification previews marked "Preview only · not sent", the redacted payload, details, the attempt log, Replay and Retry now. Order detail gains an Automation panel, and the console nav gains Automations.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (17 files, 159 tests) · `npm run build` pass · `npm run test:e2e` pass (54 tests: 27 specs × desktop/mobile) · `npm run worker -- --once` processed a due drill and scheduled its retry · `next dev` smoke check pass (automation routes 307 to login when signed out).
+- **Journey 3 status:** done for the demo store, and E2E-proven: event → worker → tags and previews, idempotent replay, retries, and the dead letter with operator action. Verified Shopify webhook delivery (step 1, "if configured") belongs to #14. No live side effects exist to authorize.
+- **Next:** #11, the AI Shopping Advisor grounded in catalog data (Journey 4; it also completes the AI part of Journey 2).
+
 ## 2026-11-07: Issue #8, merchant product editor (M2, Journey 2)
 
 - **Previous cycle:** #6 and #7 merged as `2eddbeb` (PR #26) through auto-merge. M1 is complete.

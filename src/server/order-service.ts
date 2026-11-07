@@ -6,8 +6,11 @@ import {
   formatOrderNumber,
   type Order,
 } from "@/domain/commerce/order";
+import { orderCreatedPayload } from "@/domain/events/order-created";
+import { RETRY_POLICY } from "@/domain/events/retry-policy";
 import { isCartId } from "@/server/cart-service";
 import { type Database, withTransaction } from "@/server/db/database";
+import { SqliteAutomationRepository } from "@/server/repositories/automation-repository";
 import { SqliteCartRepository } from "@/server/repositories/cart-repository";
 import { SqliteCatalogRepository } from "@/server/repositories/catalog-repository";
 import { SqliteOrderRepository } from "@/server/repositories/order-repository";
@@ -27,13 +30,15 @@ class StockChangedError extends Error {
 /**
  * Places SIMULATED orders. Everything happens in one write transaction:
  * re-read the cart and live stock, validate, insert the order with price snapshots,
- * decrement inventory with a guarded update, and delete the cart. Any failure rolls
- * back the whole order, so stock can never go negative or be sold twice.
+ * decrement inventory with a guarded update, delete the cart, and write the
+ * `order.created` event to the outbox. Any failure rolls back the whole order, so stock
+ * can never go negative or be sold twice, and an event exists exactly when its order does.
  */
 export class OrderService {
   private readonly carts: SqliteCartRepository;
   private readonly catalog: SqliteCatalogRepository;
   private readonly orders: SqliteOrderRepository;
+  private readonly outbox: SqliteAutomationRepository;
 
   constructor(
     private readonly db: Database,
@@ -43,6 +48,7 @@ export class OrderService {
     this.carts = new SqliteCartRepository(db);
     this.catalog = new SqliteCatalogRepository(db);
     this.orders = new SqliteOrderRepository(db);
+    this.outbox = new SqliteAutomationRepository(db);
   }
 
   placeOrder(cartId: string | undefined, details: CheckoutDetails): PlaceOrderResult {
@@ -93,6 +99,16 @@ export class OrderService {
 
         const order = this.orders.getById(id);
         if (!order) throw new Error("Order was not persisted");
+        // Transactional outbox: the event commits or rolls back together with the order.
+        this.outbox.enqueue({
+          id: this.newId(),
+          type: "order.created",
+          aggregateId: order.id,
+          subject: order.orderNumber,
+          payload: orderCreatedPayload(order),
+          maxAttempts: RETRY_POLICY.maxAttempts,
+          createdAt: order.createdAt,
+        });
         return { ok: true, order, confirmationToken };
       });
     } catch (error) {

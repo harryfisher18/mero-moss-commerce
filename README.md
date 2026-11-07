@@ -26,6 +26,7 @@ Requirements: **Node.js 24+** (uses the built-in `node:sqlite`) and npm 11+.
 npm install
 npm run dev            # http://localhost:3000 (the demo DB is created and seeded on first request)
 npm run db:reset       # recreate the local demo database from seed data
+npm run worker         # optional: background worker that runs scheduled automation retries
 ```
 
 Copy `.env.example` to `.env.local` to override defaults. No variables are required for DEMO mode.
@@ -36,6 +37,7 @@ Open [/admin](http://localhost:3000/admin) to:
 
 - **Orders:** list and filter simulated orders, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks).
 - **Products:** edit title, copy, status, price, compare-at price and stock per variant. Changes reach the storefront, cart and checkout on the next request, and every changed field is recorded in the product's change history.
+- **Automations:** every order writes an `order.created` event in the same transaction as the order. A worker routes it to a ship zone, flags high-value and bulk orders for review, and records notification previews. **Nothing is sent.** The job log shows each event's status, attempts, redacted payload and previews. Replay is idempotent, failures retry with bounded exponential backoff (10 s, 20 s, 40 s, 1 min 20 s), and the event moves to a dead letter queue after 5 attempts. Two labelled failure drills show retries and dead-lettering on demand.
 
 Without configuration the console uses a **public demo login**, shown on the login page:
 
@@ -47,16 +49,17 @@ To use your own credentials, set `MERCHANT_EMAIL` and `MERCHANT_PASSWORD_HASH` (
 
 ## Scripts
 
-| Command                       | Purpose                                              |
-| ----------------------------- | ---------------------------------------------------- |
-| `npm run dev`                 | Start the development server                         |
-| `npm run build` / `npm start` | Production build / serve                             |
-| `npm run lint`                | ESLint                                               |
-| `npm run typecheck`           | TypeScript type check                                |
-| `npm test`                    | Unit and integration tests (Vitest)                  |
-| `npm run test:e2e`            | End-to-end tests (Playwright, after `npm run build`) |
-| `npm run check`               | Everything CI runs: lint, typecheck, test, build     |
-| `npm run db:reset`            | Recreate the local demo database from seed data      |
+| Command                       | Purpose                                                               |
+| ----------------------------- | --------------------------------------------------------------------- |
+| `npm run dev`                 | Start the development server                                          |
+| `npm run build` / `npm start` | Production build / serve                                              |
+| `npm run lint`                | ESLint                                                                |
+| `npm run typecheck`           | TypeScript type check                                                 |
+| `npm test`                    | Unit and integration tests (Vitest)                                   |
+| `npm run test:e2e`            | End-to-end tests (Playwright, after `npm run build`)                  |
+| `npm run check`               | Everything CI runs: lint, typecheck, test, build                      |
+| `npm run db:reset`            | Recreate the local demo database from seed data                       |
+| `npm run worker`              | Poll the outbox and run due automation jobs (`-- --once` to run once) |
 
 ## Architecture
 
