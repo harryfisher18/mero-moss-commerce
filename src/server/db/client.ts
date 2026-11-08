@@ -12,7 +12,7 @@ declare global {
 export function getDatabase(): Database {
   if (!globalThis.__meroMossDb) {
     const db = openDatabase(resolveDbPath());
-    if (!isSeeded(db)) seedDatabase(db);
+    if (!isSeeded(db)) seedDatabase(db, { onlyIfEmpty: true });
     globalThis.__meroMossDb = db;
   }
   return globalThis.__meroMossDb;

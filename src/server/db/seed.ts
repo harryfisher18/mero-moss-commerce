@@ -20,10 +20,15 @@ export function variantTitle(options: Record<string, string>): string {
 }
 
 /** Inserts the synthetic demo catalog. Expects an empty, migrated database. */
-export function seedDatabase(db: Database): void {
+/**
+ * Inserts the demo catalog in one transaction. With `onlyIfEmpty`, the emptiness check runs
+ * while the write lock is held, so processes starting together cannot seed twice.
+ */
+export function seedDatabase(db: Database, options: { onlyIfEmpty?: boolean } = {}): void {
   const reference = Date.parse(SEED_REFERENCE_DATE);
 
   withTransaction(db, () => {
+    if (options.onlyIfEmpty && isSeeded(db)) return;
     const insertCategory = db.prepare(
       "INSERT INTO categories (id, handle, title, description, position) VALUES (?, ?, ?, ?, ?)",
     );
