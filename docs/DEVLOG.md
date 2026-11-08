@@ -15,6 +15,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - `/admin/integrations`: states for the catalog, Shopify, both Claude features and notifications, whether each setting is set (never its value), and what is not built. There is no Connect button, and Verify renders only with a complete configuration.
 - **Not verified:** no Shopify store or credentials exist, so the Shopify adapter is tested against a fake transport only and no webhook endpoint exists yet.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (26 files, 267 tests) · `npm run build` pass · `npm run test:e2e` pass (88 tests: 44 specs × desktop/mobile) · `next dev` smoke check pass (integrations 307 to login when signed out).
+- **PR:** [#41](https://github.com/harryfisher18/mero-moss-commerce/pull/41)
 - **Next:** #15, consent-gated lifecycle journey previews (P1).
 
 ## 2026-11-08: Issue #13, first-party analytics and funnel view
