@@ -1,0 +1,18 @@
+{
+  "id": 7300000000001,
+  "title": "Felt Desk Mat",
+  "handle": "felt-desk-mat",
+  "status": "active",
+  "updated_at": "2026-11-08T12:00:00-00:00",
+  "variants": [
+    {
+      "id": 7400000000001,
+      "product_id": 7300000000001,
+      "sku": "MM-WS-FDM-CHR-L",
+      "title": "Charcoal / Large",
+      "price": "58.00",
+      "compare_at_price": null,
+      "inventory_quantity": 9
+    }
+  ]
+}
