@@ -24,7 +24,7 @@ export default function ProductsPage() {
 const STATUS_STYLES = {
   active: "bg-moss/15 text-moss",
   draft: "bg-clay/15 text-clay",
-  archived: "bg-line text-muted",
+  archived: "bg-line text-ink",
 } as const;
 
 async function ProductsTable() {

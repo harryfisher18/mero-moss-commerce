@@ -166,6 +166,10 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
             <pre
               className="mt-2 max-h-96 overflow-auto rounded-sm border border-line bg-white p-3 text-xs"
               data-testid="event-payload"
+              // Long payloads scroll, so keyboard users must be able to reach them.
+              tabIndex={0}
+              role="region"
+              aria-label="Event payload"
             >
               {displayPayload(event)}
             </pre>

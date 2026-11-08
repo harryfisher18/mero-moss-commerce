@@ -64,17 +64,18 @@ To use your own credentials, set `MERCHANT_EMAIL` and `MERCHANT_PASSWORD_HASH` (
 
 ## Scripts
 
-| Command                       | Purpose                                                               |
-| ----------------------------- | --------------------------------------------------------------------- |
-| `npm run dev`                 | Start the development server                                          |
-| `npm run build` / `npm start` | Production build / serve                                              |
-| `npm run lint`                | ESLint                                                                |
-| `npm run typecheck`           | TypeScript type check                                                 |
-| `npm test`                    | Unit and integration tests (Vitest)                                   |
-| `npm run test:e2e`            | End-to-end tests (Playwright, after `npm run build`)                  |
-| `npm run check`               | Everything CI runs: lint, typecheck, test, build                      |
-| `npm run db:reset`            | Recreate the local demo database from seed data                       |
-| `npm run worker`              | Poll the outbox and run due automation jobs (`-- --once` to run once) |
+| Command                       | Purpose                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `npm run dev`                 | Start the development server                                                   |
+| `npm run build` / `npm start` | Production build / serve                                                       |
+| `npm run lint`                | ESLint                                                                         |
+| `npm run typecheck`           | TypeScript type check                                                          |
+| `npm test`                    | Unit and integration tests (Vitest)                                            |
+| `npm run test:e2e`            | End-to-end tests (Playwright, after `npm run build`)                           |
+| `npm run check`               | Everything CI runs: lint, typecheck, test, build                               |
+| `npm run db:reset`            | Recreate the local demo database from seed data                                |
+| `npm run worker`              | Poll the outbox and run due automation jobs (`-- --once` to run once)          |
+| `npm run perf`                | Lighthouse against a production build (see [TEST_RESULTS.md](TEST_RESULTS.md)) |
 
 ## Architecture
 

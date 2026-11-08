@@ -4,6 +4,17 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #16, accessibility and performance checks
+
+- **Previous cycle:** #43 merged as `d815e50` (PR #44) through auto-merge.
+- **Issue:** [#16](https://github.com/harryfisher18/mero-moss-commerce/issues/16), axe and Lighthouse in CI with recorded results.
+- **Implemented:** axe scans of the key storefront and merchant routes on desktop and mobile. `npm run perf` runs Lighthouse three times per page against a production build and records the settings actually applied. A `Lighthouse` CI job publishes results and is not a required check. Results are in `TEST_RESULTS.md`.
+- **Found and fixed:** clay colour contrast across the site, grey-on-line badges, the cart link's spoken name, keyboard access to scrollable regions, a 0.18 layout shift on collection pages, a missing favicon, and vague link text. `tests/unit/contrast.test.ts` checks the design tokens directly.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (30 files, 303 tests) · `npm run build` pass · `npm run test:e2e` pass (100 tests: 50 specs × desktop/mobile) · `npm run perf -- --record` pass.
+- **Not done:** no manual screen-reader or keyboard audit. Product page SEO is held back by streamed metadata, documented in `TEST_RESULTS.md`.
+- **PR:** [#45](https://github.com/harryfisher18/mero-moss-commerce/pull/45)
+- **Next:** #17, buyer-facing docs (P1).
+
 ## 2026-11-08: Issue #43, concurrent first open of the database (bug, P0)
 
 - **Previous cycle:** #15 merged as `fe2e35c` (PR #42) through auto-merge. Its first CI run on `main` failed with this bug and passed on re-run.

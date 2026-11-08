@@ -74,7 +74,13 @@ async function Report() {
             </div>
           </dl>
 
-          <div className="mt-6 overflow-x-auto rounded-sm border border-line bg-white">
+          <div
+            className="mt-6 overflow-x-auto rounded-sm border border-line bg-white"
+            // Keyboard users must be able to scroll this table on narrow screens.
+            tabIndex={0}
+            role="region"
+            aria-label="Funnel table"
+          >
             <table className="w-full min-w-[36rem] text-left text-sm" data-testid="funnel-table">
               <caption className="sr-only">Sessions reaching each step of the funnel</caption>
               <thead className="border-b border-line bg-paper text-xs tracking-wide text-muted uppercase">

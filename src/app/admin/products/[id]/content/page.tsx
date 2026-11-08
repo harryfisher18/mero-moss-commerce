@@ -38,7 +38,7 @@ const STATUS_STYLES: Record<ContentDraft["status"], string> = {
   pending: "bg-[#e6edf5] text-[#2c4a6b]",
   approved: "bg-moss/15 text-moss",
   rejected: "bg-clay/15 text-clay",
-  superseded: "bg-line text-muted",
+  superseded: "bg-line text-ink",
 };
 
 export default function ContentStudioPage({ params }: PageProps<"/admin/products/[id]/content">) {

@@ -79,7 +79,7 @@ test.describe("demo checkout", () => {
     await expect(confirmation.getByTestId("simulated-order-notice")).toContainText(
       "No payment was taken",
     );
-    await expect(page.getByTestId("header-cart")).toHaveAttribute("aria-label", "Cart, 0 items");
+    await expect(page.getByTestId("header-cart")).toHaveAttribute("aria-label", "Cart 0 items");
 
     const orderNumber = await confirmation.getByTestId("order-number").textContent();
     expect(stockOf(JAR_1L)).toBe(stockBefore - 2);

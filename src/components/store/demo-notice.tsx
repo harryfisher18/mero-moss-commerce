@@ -7,7 +7,7 @@ export function DemoNotice() {
       Demo store: products and stock are sample data and orders are simulated. No payment is ever
       taken.{" "}
       <Link href="/#demo-store" className="underline underline-offset-2">
-        Learn more
+        How this demo store works
       </Link>
     </div>
   );

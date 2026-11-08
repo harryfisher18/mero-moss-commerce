@@ -26,10 +26,11 @@ async function CartLinkWithCount() {
     <Link
       href="/cart"
       className={linkClass}
-      aria-label={`Cart, ${count} ${count === 1 ? "item" : "items"}`}
+      // The spoken name starts with the visible text ("Cart 2"), as WCAG 2.5.3 requires.
+      aria-label={`Cart ${count} ${count === 1 ? "item" : "items"}`}
       data-testid="header-cart"
     >
-      Cart
+      Cart{" "}
       <span
         aria-hidden="true"
         className="min-w-5 rounded-full bg-ink px-1.5 text-center text-xs text-paper"

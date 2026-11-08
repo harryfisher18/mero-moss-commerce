@@ -39,7 +39,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 ## M5 — Release readiness (P1)
 
-- [ ] Accessibility (axe) and performance checks in CI with recorded results (#16)
+- [x] Accessibility (axe) and performance checks in CI with recorded results (#16)
 - [ ] Buyer-facing docs: DEMO_TOUR, SERVICE_ADAPTATIONS, FEATURE_TO_CLIENT_REQUEST, INTEGRATION_STATUS, TEST_RESULTS (#17)
 
 ## Mandatory journeys (acceptance gates)
