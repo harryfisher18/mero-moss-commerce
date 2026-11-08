@@ -12,6 +12,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Found and fixed:** clay colour contrast across the site, grey-on-line badges, the cart link's spoken name, keyboard access to scrollable regions, a 0.18 layout shift on collection pages, a missing favicon, and vague link text. `tests/unit/contrast.test.ts` checks the design tokens directly.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (30 files, 303 tests) · `npm run build` pass · `npm run test:e2e` pass (100 tests: 50 specs × desktop/mobile) · `npm run perf -- --record` pass.
 - **Not done:** no manual screen-reader or keyboard audit. Product page SEO is held back by streamed metadata, documented in `TEST_RESULTS.md`.
+- **PR:** [#45](https://github.com/harryfisher18/mero-moss-commerce/pull/45)
 - **Next:** #17, buyer-facing docs (P1).
 
 ## 2026-11-08: Issue #43, concurrent first open of the database (bug, P0)
