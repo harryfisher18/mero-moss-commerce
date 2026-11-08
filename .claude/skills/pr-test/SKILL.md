@@ -107,13 +107,7 @@ npm run test:e2e       # when E2E tests exist; run `npx playwright install chrom
    - `TASKS.md`: tick completed items with the issue number.
    - `docs/DEVLOG.md`: add an entry at the top (date, issue, summary, checks run with results, next recommendation). After `gh pr create`, add the PR URL to that entry in a small follow-up commit on the same branch.
    - Any product docs whose truth changed (`README.md`, `INTEGRATION_STATUS.md`, `TEST_RESULTS.md`, …).
-3. Commit with a Conventional Commit message, e.g. `feat(storefront): add collection filters and sorting (#12)`. The commit author is the repository owner (harryfisher18). End **every** commit message with a blank line and the mentor co-author trailer:
-
-   ```text
-   Co-authored-by: Dominik Lubański <305895616+Dominic6018@users.noreply.github.com>
-   ```
-
-   Never add Claude/AI attribution.
+3. Commit with a Conventional Commit message, e.g. `feat(storefront): add collection filters and sorting (#12)`. The commit author is the repository owner (harryfisher18). Do **not** add any `Co-authored-by` trailer, and never add Claude/AI attribution.
 
 4. `git push -u origin <branch>`.
 5. Comment progress on the issue (what was implemented, checks run).
@@ -135,7 +129,7 @@ gh pr merge <n> --squash --delete-branch --body-file <merge-body>   # when green
 gh pr merge <n> --squash --delete-branch --auto --body-file <merge-body>   # when pending and auto-merge is enabled
 ```
 
-The squash commit message comes from `--body-file`. Write a short summary of the PR there, ending with a blank line and the mentor `Co-authored-by` trailer, or GitHub drops the trailer. After merging, verify it with `git log -1 --format=%B origin/main | grep Co-authored-by`.
+The squash commit message comes from `--body-file`. Write a short summary of the PR there, with no `Co-authored-by` trailer. After merging, verify that `git log -1 --format=%B origin/main` contains no `Co-authored-by` line.
 
 > **Repository rules (verified 2026-11-07):** the repo is **public**. `main` is protected: a PR is required (0 approvals), both checks must pass ("Lint, typecheck, test, build" and "End-to-end (Playwright)"), the branch must be up to date with `main`, conversations must be resolved, history is linear, and force pushes and deletions are blocked. These rules apply to admins too, so there is no bypass. Auto-merge is enabled. Prefer `gh pr merge <n> --squash --delete-branch --auto --body-file <merge-body>` right after the PR is created, then watch checks and verify the merge. If a check fails, auto-merge waits: fix and push. If the branch falls behind `main`, run `gh pr update-branch <n>`. Secret scanning push protection is on. Because the repo is public, never commit anything that is not safe to publish.
 
