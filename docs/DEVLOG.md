@@ -15,6 +15,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - `LifecycleService`: post-purchase and welcome run inside `order.created` processing, so a failed attempt rolls them back and a replay adds nothing. The dedupe key is checked before the provider is called. Abandoned carts are found by a repeatable sweep (console button and `npm run worker`).
   - Unticked opt-ins at checkout and on the cart page, and `/admin/lifecycle` with journeys, previews, skip decisions, the consent list and withdrawal.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (27 files, 281 tests) · `npm run build` pass · `npm run test:e2e` pass (96 tests: 48 specs × desktop/mobile) · `npm run worker -- --once` pass · `next dev` smoke check pass (lifecycle 307 to login when signed out).
+- **PR:** [#42](https://github.com/harryfisher18/mero-moss-commerce/pull/42)
 - **Next:** #16, accessibility and performance checks in CI (P1).
 
 ## 2026-11-08: Issue #14, integrations status and the Shopify adapter seam
