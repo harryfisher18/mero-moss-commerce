@@ -4,6 +4,20 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #13, first-party analytics and funnel view
+
+- **Previous cycle:** #10 merged as `49ce755` (PR #39) through auto-merge.
+- **Issue:** [#13](https://github.com/harryfisher18/mero-moss-commerce/issues/13), first-party analytics events and a funnel view.
+- **Implemented:**
+  - Domain (`src/domain/analytics/funnel.ts`, pure): a session counts at a step only if it reached every earlier step in order; conversion and drop-off; the beacon schema; the Global Privacy Control check.
+  - Migration 9 adds `analytics_events`: an anonymous session id, event name, product, quantity and value. There is no column for personal data, and no cart or order id.
+  - Recording: `add_to_cart` and `purchase` from the Server Actions. `view_item` and `begin_checkout` from `POST /api/analytics`, which requires a same-origin request and checks the real product or cart. Failures never break shopping.
+  - The session cookie is set by Proxy before the product page renders, so a quick add-to-cart cannot start a second session. It holds only a random id and lasts until the browser closes.
+  - `/admin/analytics` shows the funnel from recorded rows, labelled demo-session data, with its limitations. The storefront footer discloses what is recorded.
+- **Bug found and fixed:** the new background writes exposed a race in the E2E helper, whose direct database connection had no busy timeout and could fail with "database is locked". It now waits as the server does.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (24 files, 235 tests) · `npm run build` pass · `npm run test:e2e` pass (84 tests: 42 specs × desktop/mobile) · `next dev` smoke check pass (analytics 307 to login when signed out; the session cookie is set on a product page and not when `Sec-GPC: 1` is sent).
+- **Next:** #14, integrations status page and StorePlatformAdapter Shopify seam (P1).
+
 ## 2026-11-08: Issue #10, Upgrade Lab (M2)
 
 - **Previous cycle:** #36 merged as `83a1efb` (PR #37) through auto-merge.

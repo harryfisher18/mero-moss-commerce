@@ -6,7 +6,10 @@ export function StoreFooter() {
           <span className="font-serif text-base text-ink">Mero &amp; Moss</span> · Well-made
           essentials for everyday living.
         </p>
-        <p>A demo store. All products and orders are simulated.</p>
+        <p className="max-w-md sm:text-right">
+          A demo store. All products and orders are simulated. We record anonymous shopping steps,
+          never your name, email or address, and honor Global Privacy Control.
+        </p>
       </div>
     </footer>
   );

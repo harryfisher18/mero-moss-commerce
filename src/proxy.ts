@@ -1,4 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { type NextRequest, NextResponse } from "next/server";
+import {
+  ANALYTICS_COOKIE,
+  analyticsCookieOptions,
+  honorsPrivacySignal,
+} from "@/domain/analytics/funnel";
 import { CATEGORY_HANDLES } from "@/domain/commerce/catalog";
 import { getDatabase } from "@/server/db/client";
 import { MERCHANT_COOKIE, MerchantAuthService } from "@/server/merchant-auth-service";
@@ -52,6 +58,19 @@ export function proxy(request: NextRequest) {
   if (section === "products") {
     const exists = new SqliteCatalogRepository(getDatabase()).isActiveProductHandle(handle);
     if (!exists) return notFound(request);
+    // Set before rendering, so a quick add-to-cart cannot start a second analytics session.
+    const response = NextResponse.next();
+    if (
+      !request.cookies.has(ANALYTICS_COOKIE) &&
+      !honorsPrivacySignal(request.headers.get("sec-gpc"))
+    ) {
+      response.cookies.set(
+        ANALYTICS_COOKIE,
+        randomUUID(),
+        analyticsCookieOptions(process.env.NODE_ENV === "production"),
+      );
+    }
+    return response;
   }
   return NextResponse.next();
 }
