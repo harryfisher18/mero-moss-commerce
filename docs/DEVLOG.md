@@ -8,6 +8,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 - **Previous change:** #34 merged as `f53d8ad` (PR #35).
 - **Change:** commit IDs cited in this log now match the rewritten `main`. References to the removed co-author arrangement are gone, and the #32 and #34 entries describe what actually happened.
+- **PR:** [#37](https://github.com/harryfisher18/mero-moss-commerce/pull/37)
 - **Checks:** `npm run lint` pass (docs only, no code changes).
 - **Next:** #10, Upgrade Lab (P1).
 
