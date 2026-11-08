@@ -85,6 +85,8 @@ export const checkoutDetailsSchema = z.object({
     .string({ error: "ZIP code is required." })
     .trim()
     .regex(/^\d{5}(-\d{4})?$/, "Enter a 5-digit ZIP code (or ZIP+4)."),
+  /** Optional marketing opt-in. Absent means no consent. */
+  marketingConsent: z.literal("yes").optional(),
   acknowledgeSimulated: z.literal("yes", {
     error: "Please confirm you understand this is a simulated order.",
   }),

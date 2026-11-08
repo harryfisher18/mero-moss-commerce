@@ -152,6 +152,13 @@ export function CheckoutForm() {
         </div>
       </fieldset>
 
+      <label className="flex items-start gap-3 text-sm">
+        <input type="checkbox" name="marketingConsent" value="yes" className="mt-0.5" />
+        <span>
+          Email me about new pieces and my orders (optional). This demo store does not send email.
+        </span>
+      </label>
+
       <div className="rounded-sm bg-moss/10 p-4">
         <label className="flex items-start gap-3 text-sm">
           <input

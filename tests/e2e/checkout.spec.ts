@@ -38,7 +38,7 @@ async function addToCart(page: Page, path: string, quantity: number) {
 
 async function fillShipping(page: Page) {
   const form = checkoutForm(page);
-  await form.getByLabel("Email").fill("avery@example.com");
+  await form.getByLabel("Email", { exact: true }).fill("avery@example.com");
   await form.getByLabel("Full name").fill("Avery Stone");
   await form.getByLabel("Address", { exact: true }).fill("12 Elm Street");
   await form.getByLabel("City").fill("Portland");
@@ -102,18 +102,18 @@ test.describe("demo checkout", () => {
     await page.goto("/checkout");
 
     const form = checkoutForm(page);
-    await form.getByLabel("Email").fill("not-an-email");
+    await form.getByLabel("Email", { exact: true }).fill("not-an-email");
     await form.getByLabel("ZIP code").fill("123");
     await form.getByRole("button", { name: "Place simulated order" }).click();
 
     await expect(form.getByRole("alert")).toContainText("Please correct the highlighted fields.");
-    await expect(form.getByLabel("Email")).toHaveAttribute("aria-invalid", "true");
+    await expect(form.getByLabel("Email", { exact: true })).toHaveAttribute("aria-invalid", "true");
     await expect(form).toContainText("Enter a valid email address.");
     await expect(form).toContainText("Enter a 5-digit ZIP code (or ZIP+4).");
     await expect(form).toContainText("Choose a state.");
     await expect(form).toContainText("Please confirm you understand this is a simulated order.");
     // What the shopper typed is kept.
-    await expect(form.getByLabel("Email")).toHaveValue("not-an-email");
+    await expect(form.getByLabel("Email", { exact: true })).toHaveValue("not-an-email");
     expect(orderCount()).toBe(ordersBefore);
   });
 

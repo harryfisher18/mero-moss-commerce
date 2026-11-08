@@ -19,6 +19,7 @@ import {
 } from "@/domain/events/order-created";
 import { planAfterFailure, RETRY_POLICY, type RetryPolicy } from "@/domain/events/retry-policy";
 import { type Database, withTransaction } from "@/server/db/database";
+import { LifecycleService } from "@/server/lifecycle-service";
 import {
   type JobAttempt,
   type OrderTagRow,
@@ -80,6 +81,7 @@ export class AutomationService {
     private readonly now: () => Date = () => new Date(),
     private readonly newId: () => string = randomUUID,
     private readonly policy: RetryPolicy = RETRY_POLICY,
+    private readonly lifecycle: LifecycleService = new LifecycleService(db),
   ) {
     this.repo = new SqliteAutomationRepository(db);
   }
@@ -274,7 +276,7 @@ export class AutomationService {
         for (const preview of notificationPreviews(payload, routing)) {
           effects += this.repo.addPreview(event.id, preview, at);
         }
-        return effects;
+        return effects + this.lifecycle.onOrderCreated(event.id, payload, at);
       }
       case "automation.drill": {
         const parsed = drillPayloadSchema.safeParse(event.payload);

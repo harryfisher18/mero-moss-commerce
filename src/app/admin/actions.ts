@@ -8,6 +8,8 @@ import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
 import { safeAdminPath } from "@/domain/merchant/navigation";
 import { automationService } from "@/server/automation";
+import { getDatabase } from "@/server/db/client";
+import { LifecycleService } from "@/server/lifecycle-service";
 import { checkShopifyConnection } from "@/server/store-platform";
 import { contentStudio } from "@/server/content-studio";
 import {
@@ -418,4 +420,36 @@ export async function verifyShopifyConnection(): Promise<IntegrationActionState>
   return result.state === "CONNECTED_VERIFIED"
     ? { status: "success", message: "Connection verified." }
     : { status: "error", message: "The connection could not be verified." };
+}
+
+export interface LifecycleActionState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+}
+
+/** Used with useActionState. Prepares previews only; nothing is sent. */
+export async function sweepAbandonedCarts(): Promise<LifecycleActionState> {
+  await requireMerchant();
+  const { previewed, skipped } = new LifecycleService(getDatabase()).sweepAbandonedCarts();
+  return {
+    status: "success",
+    message:
+      previewed + skipped === 0
+        ? "No carts need a reminder."
+        : `${String(previewed)} previewed, ${String(skipped)} skipped.`,
+  };
+}
+
+const withdrawSchema = z.object({ email: z.email().max(254) });
+
+export async function withdrawMarketingConsent(
+  _previous: LifecycleActionState,
+  formData: FormData,
+): Promise<LifecycleActionState> {
+  await requireMerchant();
+  const input = withdrawSchema.safeParse({ email: formData.get("email") });
+  if (!input.success) return { status: "error", message: "That request was not valid." };
+  return new LifecycleService(getDatabase()).withdrawConsent(input.data.email)
+    ? { status: "success", message: "Consent withdrawn." }
+    : { status: "error", message: "That consent was already withdrawn." };
 }

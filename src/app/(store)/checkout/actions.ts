@@ -23,6 +23,7 @@ const FIELDS = [
   "region",
   "postalCode",
   "acknowledgeSimulated",
+  "marketingConsent",
 ] as const satisfies readonly CheckoutField[];
 
 export interface CheckoutActionState {
@@ -43,9 +44,11 @@ export async function placeOrder(
     const value = formData.get(field);
     if (typeof value === "string") raw[field] = value.slice(0, 300);
   }
-  // Never echo the acknowledgement: the shopper must tick it deliberately each time.
+  // Never echo the acknowledgement or opt-in: the shopper must tick them deliberately.
   const values: Partial<Record<CheckoutField, string>> = Object.fromEntries(
-    Object.entries(raw).filter(([field]) => field !== "acknowledgeSimulated"),
+    Object.entries(raw).filter(
+      ([field]) => field !== "acknowledgeSimulated" && field !== "marketingConsent",
+    ),
   );
 
   const parsed = checkoutDetailsSchema.safeParse({ ...raw, address2: raw.address2 ?? "" });

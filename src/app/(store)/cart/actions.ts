@@ -5,6 +5,8 @@ import { cartItemCount, rejectionMessage } from "@/domain/commerce/cart";
 import { MAX_QUANTITY_PER_LINE } from "@/domain/commerce/variant-selection";
 import { trackAddToCart } from "@/server/analytics";
 import { cartService, readCartId, writeCartId } from "@/server/cart-session";
+import { getDatabase } from "@/server/db/client";
+import { LifecycleService } from "@/server/lifecycle-service";
 
 /**
  * Cart Server Actions. They are public POST endpoints: every input is validated here and
@@ -101,4 +103,43 @@ export async function updateCartLine(
     status: "success",
     message: input.data.intent === "remove" ? "Item removed." : "Quantity updated.",
   };
+}
+
+export interface CartReminderState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+  readonly errors: Partial<Record<"email" | "consent", string>>;
+  readonly email: string;
+}
+
+/** Public endpoint: input is validated by the service, and consent must be explicit. */
+export async function requestCartReminder(
+  _previous: CartReminderState,
+  formData: FormData,
+): Promise<CartReminderState> {
+  const text = (name: string) => {
+    const value = formData.get(name);
+    return typeof value === "string" ? value.slice(0, 300) : "";
+  };
+  const email = text("email");
+  const result = new LifecycleService(getDatabase()).requestCartReminder(await readCartId(), {
+    email,
+    consent: text("consent"),
+  });
+  if (result.ok) {
+    return {
+      status: "success",
+      message: "Saved. This demo store prepares the reminder but does not send email.",
+      errors: {},
+      email: "",
+    };
+  }
+  return result.reason === "empty_cart"
+    ? { status: "error", message: "Your cart is empty.", errors: {}, email }
+    : {
+        status: "error",
+        message: "Please correct the highlighted fields.",
+        errors: result.errors,
+        email,
+      };
 }

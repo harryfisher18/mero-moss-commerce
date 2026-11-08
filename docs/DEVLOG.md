@@ -4,6 +4,19 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #15, consent-gated lifecycle journey previews
+
+- **Previous cycle:** #14 merged as `105a8be` (PR #41) through auto-merge.
+- **Issue:** [#15](https://github.com/harryfisher18/mero-moss-commerce/issues/15), consent-gated lifecycle journey previews.
+- **Implemented:**
+  - Domain (`src/domain/lifecycle/journeys.ts`, pure): journey definitions, the consent gate (no consent means the message is not rendered), dedupe keys, and message rendering with no discounts or urgency.
+  - Migration 10 adds `marketing_consents`, `cart_contacts` (removed with the cart) and `lifecycle_messages` (unique dedupe key; `CHECK (delivery = 'preview_only')`; skipped journeys store no email).
+  - `MarketingProvider` with a demo implementation that contacts nobody.
+  - `LifecycleService`: post-purchase and welcome run inside `order.created` processing, so a failed attempt rolls them back and a replay adds nothing. The dedupe key is checked before the provider is called. Abandoned carts are found by a repeatable sweep (console button and `npm run worker`).
+  - Unticked opt-ins at checkout and on the cart page, and `/admin/lifecycle` with journeys, previews, skip decisions, the consent list and withdrawal.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (27 files, 281 tests) · `npm run build` pass · `npm run test:e2e` pass (96 tests: 48 specs × desktop/mobile) · `npm run worker -- --once` pass · `next dev` smoke check pass (lifecycle 307 to login when signed out).
+- **Next:** #16, accessibility and performance checks in CI (P1).
+
 ## 2026-11-08: Issue #14, integrations status and the Shopify adapter seam
 
 - **Previous cycle:** #13 merged as `988d840` (PR #40) through auto-merge.
