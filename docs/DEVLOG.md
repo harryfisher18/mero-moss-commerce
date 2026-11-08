@@ -11,6 +11,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Reproduced first:** a new test starts 8 real processes that open one fresh database together. It failed on the old code with `database is locked`.
 - **Fix:** `busy_timeout` is set first, and the switch to WAL has a bounded retry because SQLite can report that conflict without using the busy timeout. `migrate()` re-checks each migration inside the write transaction. `seedDatabase(db, { onlyIfEmpty: true })` checks for existing data while holding the write lock.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (28 files, 282 tests) · concurrency test pass in 15 of 15 runs (360 simultaneous opens) · `npm run build` pass 3 times from a new database · `npm run test:e2e` pass (96 tests).
+- **PR:** [#44](https://github.com/harryfisher18/mero-moss-commerce/pull/44)
 - **Next:** #16, accessibility and performance checks in CI (P1).
 
 ## 2026-11-08: Issue #15, consent-gated lifecycle journey previews
