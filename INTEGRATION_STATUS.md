@@ -29,7 +29,7 @@ Klaviyo, Google Analytics, Meta, n8n, Slack and WooCommerce have no connector. F
 
 - **Settings:** `SHOPIFY_WEBHOOK_SECRET`.
 - **What exists:** `verifyShopifyWebhook` checks the base64 HMAC-SHA256 of the raw body with a timing-safe comparison.
-- **Tests:** valid signatures, altered bodies, wrong secrets and malformed headers. See `src/domain/integrations/shopify.test.ts`.
+- **Tests:** valid signatures, altered bodies, wrong secrets and malformed headers, in `src/domain/integrations/shopify.test.ts`. Synthetic samples in `docs/samples/webhooks/` are checked against signatures produced by `openssl`.
 - **Missing:** an endpoint to receive webhooks, deduplication and reconciliation.
 
 ## Claude (advisor wording and Content Studio drafts)

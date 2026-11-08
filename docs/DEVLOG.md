@@ -4,6 +4,16 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #47, sample webhook events and deployment notes
+
+- **Previous cycle:** #38 merged as `3169cdc` (PR #48) through auto-merge.
+- **Issue:** [#47](https://github.com/harryfisher18/mero-moss-commerce/issues/47), the last deliverable from the product requirements.
+- **Added:** synthetic Shopify-style samples in `docs/samples/webhooks/`, labelled as not captured from a real store, with a signing command. `tests/unit/sample-webhooks.test.ts` checks them against signatures produced independently by `openssl`, and checks that `DEPLOYMENT.md` documents every setting in `.env.example`. `DEPLOYMENT.md` covers requirements, run steps, settings, data handling and limits.
+- **Verified:** `npm start` served from a new database with `Secure` cookies, and `npm run worker -- --once` ran against it. No deployment was made.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (31 files, 324 tests) · `npm run build` pass · `npm run test:e2e` pass (106 tests).
+- **PR:** [#50](https://github.com/harryfisher18/mero-moss-commerce/pull/50)
+- **Next:** #49, verifying the Shopify adapter on a real development store. It is blocked until the owner provides one.
+
 ## 2026-11-08: Issue #38, admin login keeps the requested page's query (bug, P2)
 
 - **Previous cycle:** #17 merged as `49f752d` (PR #46) through auto-merge.

@@ -1,0 +1,32 @@
+{
+  "id": 7100000000001,
+  "name": "#1001",
+  "email": "sample.shopper@example.com",
+  "created_at": "2026-11-08T12:00:00-00:00",
+  "currency": "USD",
+  "subtotal_price": "58.00",
+  "total_price": "58.00",
+  "financial_status": "paid",
+  "test": true,
+  "line_items": [
+    {
+      "id": 7200000000001,
+      "product_id": 7300000000001,
+      "variant_id": 7400000000001,
+      "sku": "MM-WS-FDM-CHR-L",
+      "title": "Felt Desk Mat",
+      "variant_title": "Charcoal / Large",
+      "quantity": 1,
+      "price": "58.00"
+    }
+  ],
+  "shipping_address": {
+    "first_name": "Sample",
+    "last_name": "Shopper",
+    "address1": "1 Example Street",
+    "city": "Portland",
+    "province_code": "OR",
+    "zip": "97205",
+    "country_code": "US"
+  }
+}

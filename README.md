@@ -87,6 +87,8 @@ A single Next.js 16 App Router application in strict TypeScript, with pure domai
 - [FEATURE_TO_CLIENT_REQUEST.md](FEATURE_TO_CLIENT_REQUEST.md): what you can try for each kind of project
 - [SERVICE_ADAPTATIONS.md](SERVICE_ADAPTATIONS.md): what exists and what would be built for each project
 - [INTEGRATION_STATUS.md](INTEGRATION_STATUS.md): the real state of every connection
+- [DEPLOYMENT.md](DEPLOYMENT.md): running it outside a development machine, and its limits
+- [docs/samples/webhooks/](docs/samples/webhooks/README.md): synthetic webhook samples and how to sign them
 - [TEST_RESULTS.md](TEST_RESULTS.md): what has been run, and the coverage gaps
 - [PROJECT_BRIEF.md](PROJECT_BRIEF.md): product promise, target buyers, non-goals
 - [TASKS.md](TASKS.md): milestones and status
