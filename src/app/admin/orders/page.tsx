@@ -39,16 +39,21 @@ async function OrdersTable({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await requireMerchant();
-  const { status: raw } = await searchParams;
-  const status = ORDER_STATUSES.find((s) => s === raw) as OrderStatus | undefined;
-  const orders = merchantOrders().list(status);
+  const { status: raw, view } = await searchParams;
+  const reviewOnly = view === "review";
+  const status = reviewOnly
+    ? undefined
+    : (ORDER_STATUSES.find((s) => s === raw) as OrderStatus | undefined);
+  const service = merchantOrders();
+  const held = service.listHeldForReview();
+  const orders = reviewOnly ? held : service.list(status);
 
   return (
     <>
       <nav aria-label="Filter by status" className="mt-6">
         <ul className="flex flex-wrap gap-2 text-sm">
           {[undefined, ...ORDER_STATUSES].map((value) => {
-            const current = value === status;
+            const current = value === status && !reviewOnly;
             return (
               <li key={value ?? "all"}>
                 <Link
@@ -63,12 +68,29 @@ async function OrdersTable({
               </li>
             );
           })}
+          <li>
+            <Link
+              href="/admin/orders?view=review"
+              aria-current={reviewOnly ? "page" : undefined}
+              className={`inline-block rounded-full border px-3 py-1 ${
+                reviewOnly
+                  ? "border-ink bg-ink text-paper"
+                  : "border-clay text-clay hover:bg-clay/10"
+              }`}
+            >
+              Needs review ({held.length})
+            </Link>
+          </li>
         </ul>
       </nav>
 
       {orders.length === 0 ? (
         <div className="mt-8 rounded-sm border border-dashed border-line p-10 text-center">
-          <p className="font-serif text-xl">No orders {status ? "with this status" : "yet"}.</p>
+          <p className="font-serif text-xl">
+            {reviewOnly
+              ? "No orders are waiting for review."
+              : `No orders ${status ? "with this status" : "yet"}.`}
+          </p>
           <p className="mt-2 text-sm text-muted">
             Orders appear here as soon as a shopper completes the demo checkout.
           </p>

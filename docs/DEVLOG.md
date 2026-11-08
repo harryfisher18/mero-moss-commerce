@@ -4,6 +4,21 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #51, order review queue and fulfillment preview
+
+- **Previous cycle:** #47 merged as `c4870ca` (PR #50) through auto-merge.
+- **Selection:** the only open issue, #49, is blocked on a Shopify store from the owner. An audit of the product requirements found this as the largest unmet item: automation said orders were held for review, but nothing held them.
+- **Issue:** [#51](https://github.com/harryfisher18/mero-moss-commerce/issues/51), the review queue and fulfillment preview.
+- **Implemented:**
+  - `src/domain/commerce/order-review.ts` (pure): review state, the hold rule and the fulfillment preview.
+  - Migration 11 adds `order_reviews`, recording who cleared an order and when.
+  - `MerchantOrderService` refuses to progress a held order, inside the status transaction. Cancelling stays allowed.
+  - A **Needs review** queue on Orders, and Review and Fulfillment preview panels on the order page. The preview shows routing, readiness and a pick list, with no customer name or street, and says nothing is sent.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (32 files, 333 tests) · `npm run build` pass · `npm run test:e2e` pass (110 tests: 55 specs × desktop/mobile) · `next dev` smoke check pass.
+- **Remaining from the audit, in `TASKS.md`:** storefront product search, a merchant overview page, and merchant settings with demo reset.
+- **PR:** [#52](https://github.com/harryfisher18/mero-moss-commerce/pull/52)
+- **Next:** storefront product search.
+
 ## 2026-11-08: Issue #47, sample webhook events and deployment notes
 
 - **Previous cycle:** #38 merged as `3169cdc` (PR #48) through auto-merge.

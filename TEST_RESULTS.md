@@ -4,15 +4,15 @@ What has actually been run against Mero & Moss, and what those runs do not prove
 
 ## Latest full run
 
-Run on 2026-11-08 on Windows, on the branch for issue #47, based on `3169cdc`.
+Run on 2026-11-08 on Windows, on the branch for issue #51, based on `c4870ca`.
 
 | Command             | What it covers                                         | Result                                   |
 | ------------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `npm run lint`      | ESLint and Prettier                                    | Pass                                     |
 | `npm run typecheck` | Strict TypeScript                                      | Pass                                     |
-| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 324 tests in 31 files              |
+| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 333 tests in 32 files              |
 | `npm run build`     | Production build                                       | Pass                                     |
-| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 106 tests (53 specs on 2 projects) |
+| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 110 tests (55 specs on 2 projects) |
 
 The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR.md](DEMO_TOUR.md), and the accessibility scans below.
 

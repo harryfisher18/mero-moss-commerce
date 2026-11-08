@@ -158,15 +158,29 @@ export class SqliteOrderRepository implements OrderRepository {
   }
 
   listSummaries(status?: OrderStatus): OrderSummary[] {
+    return status ? this.summaries("WHERE o.status = ?", [status]) : this.summaries("", []);
+  }
+
+  /** Placed orders that automation flagged and nobody has cleared yet. */
+  listHeldForReview(): OrderSummary[] {
+    return this.summaries(
+      `WHERE o.status = 'placed'
+         AND EXISTS (SELECT 1 FROM order_tags t WHERE t.order_id = o.id AND t.tag LIKE 'review:%')
+         AND NOT EXISTS (SELECT 1 FROM order_reviews r WHERE r.order_id = o.id)`,
+      [],
+    );
+  }
+
+  private summaries(where: string, params: readonly string[]): OrderSummary[] {
     const sql = `
       SELECT o.id, o.order_number, o.status, o.full_name, o.email, o.currency, o.total_minor,
              o.created_at, COALESCE(SUM(l.quantity), 0) AS item_count
       FROM orders o LEFT JOIN order_lines l ON l.order_id = o.id
-      ${status ? "WHERE o.status = ?" : ""}
+      ${where}
       GROUP BY o.id
       ORDER BY o.sequence DESC
       LIMIT 200`;
-    const rows = status ? this.db.prepare(sql).all(status) : this.db.prepare(sql).all();
+    const rows = this.db.prepare(sql).all(...params);
     return rows.map((raw) => {
       const row = summaryRow.parse(raw);
       return {

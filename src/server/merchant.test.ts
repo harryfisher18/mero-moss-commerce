@@ -103,6 +103,58 @@ describe("MerchantOrderService", () => {
     if (!placed.ok) throw new Error("expected order");
     return placed.order;
   }
+
+  describe("order review", () => {
+    const flag = (orderId: string) =>
+      db
+        .prepare(
+          `INSERT INTO outbox_events (id, type, aggregate_id, subject, payload, max_attempts, next_attempt_at, created_at)
+         VALUES (?, 'automation.drill', 'drill', 'x', '{}', 5, 't', 't')`,
+        )
+        .run(`evt-${orderId}`) &&
+      db
+        .prepare(
+          "INSERT INTO order_tags (order_id, tag, source_event_id, created_at) VALUES (?, 'review:high-value', ?, 't')",
+        )
+        .run(orderId, `evt-${orderId}`);
+
+    it("queues flagged orders and blocks processing on the server until cleared", () => {
+      const order = placeOrder(1);
+      const service = new MerchantOrderService(db, () => "2026-11-08T12:00:00.000Z");
+      expect(service.listHeldForReview()).toEqual([]);
+      expect(service.clearReview(order.id, "owner@example.com")).toEqual({
+        ok: false,
+        reason: "not_held",
+      });
+
+      flag(order.id);
+      expect(service.listHeldForReview().map((o) => o.id)).toEqual([order.id]);
+      expect(service.transition(order.id, "processing", "owner@example.com")).toEqual({
+        ok: false,
+        reason: "needs_review",
+      });
+
+      expect(service.clearReview(order.id, "owner@example.com")).toEqual({ ok: true });
+      expect(service.review(order.id)).toMatchObject({
+        kind: "cleared",
+        clearance: { clearedBy: "owner@example.com" },
+      });
+      expect(service.listHeldForReview()).toEqual([]);
+      expect(service.clearReview(order.id, "owner@example.com")).toEqual({
+        ok: false,
+        reason: "not_held",
+      });
+      expect(service.transition(order.id, "processing", "owner@example.com").ok).toBe(true);
+    });
+
+    it("still lets a merchant cancel a held order", () => {
+      const order = placeOrder(1);
+      flag(order.id);
+      const service = new MerchantOrderService(db);
+      expect(service.transition(order.id, "cancelled", "owner@example.com").ok).toBe(true);
+      expect(service.listHeldForReview()).toEqual([]);
+    });
+  });
   const stock = () =>
     Number(db.prepare("SELECT inventory_quantity AS q FROM variants WHERE id = ?").get(TRIVET)?.q);
 
