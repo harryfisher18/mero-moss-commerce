@@ -16,6 +16,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - A **Needs review** queue on Orders, and Review and Fulfillment preview panels on the order page. The preview shows routing, readiness and a pick list, with no customer name or street, and says nothing is sent.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (32 files, 333 tests) · `npm run build` pass · `npm run test:e2e` pass (110 tests: 55 specs × desktop/mobile) · `next dev` smoke check pass.
 - **Remaining from the audit, in `TASKS.md`:** storefront product search, a merchant overview page, and merchant settings with demo reset.
+- **PR:** [#52](https://github.com/harryfisher18/mero-moss-commerce/pull/52)
 - **Next:** storefront product search.
 
 ## 2026-11-08: Issue #47, sample webhook events and deployment notes
