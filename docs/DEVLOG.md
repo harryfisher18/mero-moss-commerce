@@ -11,6 +11,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Fix:** Proxy now carries the query through the login redirect. `safeAdminPath` allows a query on console paths and still refuses absolute URLs, protocol-relative paths, backslashes, fragments, whitespace and control characters. A very long destination no longer blocks sign-in: the query is dropped or the default page is used.
 - **Changed test:** one existing case expected any query to be refused. That was the behaviour being changed, so it moved out of the refused list, and hostile queries are now tested explicitly.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (30 files, 317 tests) · `npm run build` pass · `npm run test:e2e` pass (106 tests: 53 specs × desktop/mobile).
+- **PR:** [#48](https://github.com/harryfisher18/mero-moss-commerce/pull/48)
 - **Next:** #47, sample webhook events and deployment notes (P2).
 
 ## 2026-11-08: Issue #17, buyer-facing docs
