@@ -4,25 +4,32 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
-## 2026-11-08: Issue #34, co-author commits with the owner and Claude (chore)
+## 2026-11-08: Issue #36, bring this log up to date after the history rewrites (docs)
 
-- **Previous change:** #32 was merged, and the owner then authorized a one-off rewrite of `main` that removed the earlier mentor trailers. `main` was at `0da882d` afterwards, so commit IDs cited in older entries of this log predate that rewrite.
-- **Change:** at the owner's request, every new commit and squash merge carries `Co-authored-by` trailers for Harry Fisher and Claude. `CLAUDE.md` and the `/pr-test` workflow are updated. Existing commits are unchanged.
-- **PR:** [#35](https://github.com/harryfisher18/mero-moss-commerce/pull/35)
+- **Previous change:** #34 merged as `f53d8ad` (PR #35).
+- **Change:** commit IDs cited in this log now match the rewritten `main`. References to the removed co-author arrangement are gone, and the #32 and #34 entries describe what actually happened.
 - **Checks:** `npm run lint` pass (docs only, no code changes).
 - **Next:** #10, Upgrade Lab (P1).
 
-## 2026-11-08: Issue #32, stop adding the mentor co-author trailer (chore)
+## 2026-11-08: Issue #34, co-author commits with the owner and Claude (chore)
 
-- **Previous cycle:** #23 merged as `84b8dea` (PR #31) through auto-merge.
-- **Change:** at the owner's request, `CLAUDE.md` and the `/pr-test` workflow no longer require a `Co-authored-by: Dominik Lubański` trailer. From this commit on, commits and squash merges carry no co-author trailer, and still no AI attribution.
-- **Not changed:** commits merged between PR #21 (`88db869`) and PR #31 (`84b8dea`) still contain the trailer. Removing it would mean rewriting published history on protected `main`, which waits for an explicit decision by the owner.
+- **Previous change:** #32 merged as `fd8bb5b`.
+- **Change:** at the owner's request, every commit and squash merge carries `Co-authored-by` trailers for Harry Fisher and Claude. `CLAUDE.md` and the `/pr-test` workflow are updated.
+- **History:** the owner authorized one-off rewrites of `main` that removed earlier co-author trailers and added both trailers to all existing commits. Branch protection was lifted only for those pushes and restored to its previous settings.
+- **Checks:** `npm run lint` pass (docs only, no code changes).
+- **PR:** [#35](https://github.com/harryfisher18/mero-moss-commerce/pull/35)
+- **Next:** #10, Upgrade Lab (P1).
+
+## 2026-11-08: Issue #32, stop requiring the previous co-author trailer (chore)
+
+- **Previous cycle:** #23 merged as `c132d11` (PR #31) through auto-merge.
+- **Change:** at the owner's request, `CLAUDE.md` and the `/pr-test` workflow stopped requiring the previous co-author trailer. #34 replaced this rule.
 - **Checks:** `npm run lint` pass (docs only, no code changes).
 - **Next:** #10, Upgrade Lab (P1).
 
 ## 2026-11-08: Issue #23, collection shell survives path revalidation (bug, P1)
 
-- **Previous cycle:** #12 merged as `885fe0f` (PR #30) through auto-merge. All four mandatory journeys are done.
+- **Previous cycle:** #12 merged as `1b689ac` (PR #30) through auto-merge. All four mandatory journeys are done.
 - **Issue:** [#23](https://github.com/harryfisher18/mero-moss-commerce/issues/23), the collection page shell fails to re-prerender when paths are revalidated.
 - **Reproduced first:** a production build with a temporary `revalidatePath("/", "layout")` in `addToCart` (never committed). After one add-to-cart, `/collections/workspace` and `/collections/all` returned **HTTP 500** with "Route \"/collections/[handle]\": Next.js encountered uncached or runtime data during prerendering". That is worse than the logged error the issue describes.
 - **Fix:**
@@ -37,7 +44,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-08: Issue #12, AI Content Studio (M3, Journey 4b)
 
-- **Previous cycle:** #11 merged as `e5aad66` (PR #29) through auto-merge, after CI caught a mobile nav overflow that was fixed in the same PR.
+- **Previous cycle:** #11 merged as `8911aef` (PR #29) through auto-merge, after CI caught a mobile nav overflow that was fixed in the same PR.
 - **Issue:** [#12](https://github.com/harryfisher18/mero-moss-commerce/issues/12), product content drafts with a diff, approval and an audited demo publish.
 - **Implemented:**
   - Domain (`src/domain/content`, pure):
@@ -67,7 +74,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-08: Issue #11, AI Shopping Advisor (M3, Journey 4a)
 
-- **Previous cycle:** #9 merged as `3f00f1f` (PR #28) through auto-merge.
+- **Previous cycle:** #9 merged as `cbedc54` (PR #28) through auto-merge.
 - **Issue:** [#11](https://github.com/harryfisher18/mero-moss-commerce/issues/11), the AI Shopping Advisor grounded in catalog data, with a no-key fallback and escalation.
 - **Implemented:**
   - Domain (`src/domain/advisor`, pure):
@@ -88,7 +95,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-08: Issue #9, durable order automation (M2, Journey 3)
 
-- **Previous cycle:** #8 merged as `88e334c` (PR #27) through auto-merge.
+- **Previous cycle:** #8 merged as `40c3cb4` (PR #27) through auto-merge.
 - **Issue:** [#9](https://github.com/harryfisher18/mero-moss-commerce/issues/9), the durable order event outbox and worker with retries, idempotency and a job inspector.
 - **Implemented:**
   - Domain (`src/domain/events`, pure):
@@ -107,7 +114,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-07: Issue #8, merchant product editor (M2, Journey 2)
 
-- **Previous cycle:** #6 and #7 merged as `2eddbeb` (PR #26) through auto-merge. M1 is complete.
+- **Previous cycle:** #6 and #7 merged as `a9c3df9` (PR #26) through auto-merge. M1 is complete.
 - **Issue:** [#8](https://github.com/harryfisher18/mero-moss-commerce/issues/8), the merchant product editor that propagates to the storefront with an audit log.
 - **Implemented:**
   - Domain:
@@ -126,7 +133,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-07: Issues #6 + #7, merchant console and Journey 1 E2E (M1)
 
-- **Previous cycle:** #5 merged as `5f0d59c` (PR #25) through auto-merge. Both checks were green on main.
+- **Previous cycle:** #5 merged as `6409ec8` (PR #25) through auto-merge. Both checks were green on main.
 - **Issues:** [#6](https://github.com/harryfisher18/mero-moss-commerce/issues/6), merchant authentication and orders console. [#7](https://github.com/harryfisher18/mero-moss-commerce/issues/7), the Journey 1 E2E in CI. I did them together because #7's last step needs #6.
 - **Implemented:**
   - Domain:
@@ -150,7 +157,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-07: Issue #5, demo checkout (M1)
 
-- **Previous cycle:** #4 merged as `bd29929` (PR #24) through auto-merge. Both checks were green on main.
+- **Previous cycle:** #4 merged as `18d0ff1` (PR #24) through auto-merge. Both checks were green on main.
 - **Issue:** [#5](https://github.com/harryfisher18/mero-moss-commerce/issues/5), the demo checkout that creates simulated orders and decrements inventory atomically.
 - **Implemented:**
   - Pure `order` domain:
@@ -170,7 +177,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-07: Issue #4, cart (M1)
 
-- **Previous cycles:** #3 merged as `5de39b6` (PR #20). PR #21 (`88db869`) adds the mentor co-author trailer. PR #22 (`27eada1`) was the first auto-merge through the protected `main`.
+- **Previous cycles:** #3 merged as `59b62f3` (PR #20). PR #22 (`5ea05e0`) was the first auto-merge through the protected `main`.
 - **Issue:** [#4](https://github.com/harryfisher18/mero-moss-commerce/issues/4), the cart with persisted state, quantity edits, stock validation and totals.
 - **Implemented:**
   - Pure `cart` domain:
@@ -193,14 +200,13 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-07: Repository settings (M0)
 
-- **Co-author:** PR #21 (merged as `88db869`) makes every commit and squash merge carry a `Co-authored-by` trailer for Dominik Lubański (Dominic6018), the project mentor.
 - **Visibility:** the owner made the repository **public**. Before relying on that, I scanned all git history for tokens, private keys, `.env` and database files and found none.
 - **Protection applied:** `main` requires a PR and both CI checks (strict, up to date), with linear history, conversation resolution, no force pushes or deletions, enforced for admins, and 0 required approvals. Auto-merge, secret scanning and push protection are enabled.
 - **Next:** #4, the cart.
 
 ## 2026-11-06: Issue #3, product detail page (M1)
 
-- **Previous cycle:** issue #2 merged as `6bcb01b` (PR #19). Both CI jobs were green on main.
+- **Previous cycle:** issue #2 merged as `2d17962` (PR #19). Both CI jobs were green on main.
 - **Issue:** [#3](https://github.com/harryfisher18/mero-moss-commerce/issues/3), the product detail page with variant selection, availability and stored policies.
 - **Implemented:**
   - Pure `variant-selection` domain module:
@@ -220,7 +226,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ## 2026-11-05: Issue #2, collection pages (M1)
 
-- **Previous cycle:** issue #1 merged as `6b7bb96` (PR #18). CI was green on main.
+- **Previous cycle:** issue #1 merged as `c5892f8` (PR #18). CI was green on main.
 - **Issue:** [#2](https://github.com/harryfisher18/mero-moss-commerce/issues/2), collection pages with filters, sorting, pagination and stable URL params.
 - **Implemented:**
   - Pure `collection-query` domain module. It parses URL params with zod and falls back safely on invalid values. It serializes URLs in a stable, minimal form and handles filtering, sorting, pagination and facets. A product matches only when a single variant satisfies every active filter.
