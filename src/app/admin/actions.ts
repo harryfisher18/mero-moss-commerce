@@ -6,7 +6,7 @@ import { ORDER_STATUSES } from "@/domain/commerce/order";
 import type { RawProductEdit } from "@/domain/commerce/product-edit";
 import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
-import { safeAdminPath } from "@/domain/merchant/navigation";
+import { MAX_ADMIN_PATH_LENGTH, safeAdminPath } from "@/domain/merchant/navigation";
 import { automationService } from "@/server/automation";
 import { getDatabase } from "@/server/db/client";
 import { LifecycleService } from "@/server/lifecycle-service";
@@ -34,7 +34,8 @@ export interface LoginState {
 const loginSchema = z.object({
   email: z.string().trim().max(254),
   password: z.string().max(200),
-  next: z.string().max(200).optional(),
+  // An unusable destination must never block sign-in; it falls back to the default page.
+  next: z.string().max(MAX_ADMIN_PATH_LENGTH).optional().catch(undefined),
 });
 
 export async function login(_previous: LoginState, formData: FormData): Promise<LoginState> {

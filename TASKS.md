@@ -42,6 +42,10 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Accessibility (axe) and performance checks in CI with recorded results (#16)
 - [x] Buyer-facing docs: DEMO_TOUR, SERVICE_ADAPTATIONS, FEATURE_TO_CLIENT_REQUEST, INTEGRATION_STATUS, TEST_RESULTS (#17)
 
+## Remaining from the product requirements (P2)
+
+- [ ] Sample webhook events and practical deployment notes (#47)
+
 ## Mandatory journeys (acceptance gates)
 
 - [x] Journey 1 — Shopper to order (#7)

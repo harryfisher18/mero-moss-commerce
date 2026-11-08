@@ -4,15 +4,15 @@ What has actually been run against Mero & Moss, and what those runs do not prove
 
 ## Latest full run
 
-Run on 2026-11-08 on Windows, on the branch for issue #17, based on `b47ada1`.
+Run on 2026-11-08 on Windows, on the branch for issue #38, based on `49f752d`.
 
 | Command             | What it covers                                         | Result                                   |
 | ------------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `npm run lint`      | ESLint and Prettier                                    | Pass                                     |
 | `npm run typecheck` | Strict TypeScript                                      | Pass                                     |
-| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 303 tests in 30 files              |
+| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 317 tests in 30 files              |
 | `npm run build`     | Production build                                       | Pass                                     |
-| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 102 tests (51 specs on 2 projects) |
+| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 106 tests (53 specs on 2 projects) |
 
 The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR.md](DEMO_TOUR.md), and the accessibility scans below.
 
@@ -85,4 +85,3 @@ These runs also changed the product. Fixed as a result:
 - **Assistive technology:** no manual screen-reader or keyboard audit.
 - **Load:** no load or concurrency testing beyond first-open database safety. The demo runs on SQLite on one server.
 - **Deployment:** no production deployment has been made or tested.
-- **Known bug:** signing in drops the query string of the requested admin page ([#38](https://github.com/harryfisher18/mero-moss-commerce/issues/38)).

@@ -6,6 +6,7 @@ import {
   honorsPrivacySignal,
 } from "@/domain/analytics/funnel";
 import { CATEGORY_HANDLES } from "@/domain/commerce/catalog";
+import { adminLoginDestination } from "@/domain/merchant/navigation";
 import { getDatabase } from "@/server/db/client";
 import { MERCHANT_COOKIE, MerchantAuthService } from "@/server/merchant-auth-service";
 import { SqliteCatalogRepository } from "@/server/repositories/catalog-repository";
@@ -47,7 +48,10 @@ export function proxy(request: NextRequest) {
     const isLogin = request.nextUrl.pathname === "/admin/login";
     if (!signedIn && !isLogin) {
       const login = new URL("/admin/login", request.url);
-      login.searchParams.set("next", request.nextUrl.pathname);
+      login.searchParams.set(
+        "next",
+        adminLoginDestination(request.nextUrl.pathname, request.nextUrl.search),
+      );
       return NextResponse.redirect(login);
     }
     if (signedIn && (isLogin || request.nextUrl.pathname === "/admin")) {

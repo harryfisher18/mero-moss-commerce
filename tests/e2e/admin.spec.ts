@@ -4,6 +4,30 @@ import { addToCart, checkout, DEMO_MERCHANT, signInAsMerchant, stockOf, visible 
 const JAR_2L = "var_mm-tk-gpj-20"; // Glass Pantry Jar, 2 L
 
 test.describe("merchant console", () => {
+  test("signing in returns to the requested page with its query", async ({ page }) => {
+    await signInAsMerchant(page, "/admin/orders?status=cancelled");
+    await expect(page).toHaveURL(/\/admin\/orders\?status=cancelled$/);
+    await expect(
+      page.getByRole("link", { name: "Cancelled" }).locator("visible=true"),
+    ).toHaveAttribute("aria-current", "page");
+  });
+
+  test("hostile or oversized destinations cannot redirect or block sign-in", async ({ page }) => {
+    for (const next of [
+      "https://evil.example/?a=1",
+      "//evil.example/admin/orders?a=1",
+      `/admin/orders?q=${"x".repeat(3000)}`,
+    ]) {
+      await page.goto(`/admin/login?next=${encodeURIComponent(next)}`);
+      const form = visible(page, "login-form");
+      await form.getByLabel("Email").fill(DEMO_MERCHANT.email);
+      await form.getByLabel("Password").fill(DEMO_MERCHANT.password);
+      await form.getByRole("button", { name: "Sign in" }).click();
+      await expect(page).toHaveURL(/localhost:\d+\/admin\/orders$/);
+      await page.context().clearCookies();
+    }
+  });
+
   test("signed-out visitors are redirected to login before anything renders", async ({ page }) => {
     const response = await page.request.get("/admin/orders", { maxRedirects: 0 });
     expect(response.status()).toBe(307);
