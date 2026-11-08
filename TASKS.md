@@ -24,7 +24,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 - [x] Merchant product editor (price, stock, details) that propagates to the storefront, with an audit log (Journey 2) (#8)
 - [x] Durable order event outbox and worker: routing tags, notification preview, idempotent replay, bounded retries, dead letter, job inspector (Journey 3) (#9)
-- [ ] Upgrade Lab: interactive, clearly illustrative before/after for product page, discovery and order operations (#10)
+- [x] Upgrade Lab: interactive, clearly illustrative before/after for product page, discovery and order operations (#10)
 
 ## M3 — Applied AI grounded in commerce data (P0)
 

@@ -53,6 +53,9 @@ async function SignedInNav() {
       <Link href="/admin/support" className="hover:underline">
         Requests
       </Link>
+      <Link href="/admin/upgrade-lab" className="hover:underline">
+        Upgrade Lab
+      </Link>
       <Link href="/" className="hover:underline">
         View store
       </Link>
