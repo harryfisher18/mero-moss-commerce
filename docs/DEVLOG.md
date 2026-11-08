@@ -4,6 +4,19 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #14, integrations status and the Shopify adapter seam
+
+- **Previous cycle:** #13 merged as `988d840` (PR #40) through auto-merge.
+- **Issue:** [#14](https://github.com/harryfisher18/mero-moss-commerce/issues/14), an honest integrations page and a `StorePlatformAdapter` seam.
+- **Implemented:**
+  - `src/domain/integrations/shopify.ts`: configuration parsing that names problems but never repeats values and only accepts `*.myshopify.com` domains, plus `verifyShopifyWebhook` (base64 HMAC-SHA256 over the raw body with a timing-safe compare).
+  - `StorePlatformAdapter`, read-only by design: `DemoStoreAdapter` over the local catalog and `ShopifyStoreAdapter` (Admin GraphQL, cursor pagination, 10 s timeout, zod-validated responses).
+  - `PlatformStatus`: configuration alone never reports a working connection; only a successful real check gives `CONNECTED_VERIFIED`.
+  - `/admin/integrations`: states for the catalog, Shopify, both Claude features and notifications, whether each setting is set (never its value), and what is not built. There is no Connect button, and Verify renders only with a complete configuration.
+- **Not verified:** no Shopify store or credentials exist, so the Shopify adapter is tested against a fake transport only and no webhook endpoint exists yet.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (26 files, 267 tests) · `npm run build` pass · `npm run test:e2e` pass (88 tests: 44 specs × desktop/mobile) · `next dev` smoke check pass (integrations 307 to login when signed out).
+- **Next:** #15, consent-gated lifecycle journey previews (P1).
+
 ## 2026-11-08: Issue #13, first-party analytics and funnel view
 
 - **Previous cycle:** #10 merged as `49ce755` (PR #39) through auto-merge.

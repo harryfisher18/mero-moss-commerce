@@ -34,7 +34,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 ## M4 — Analytics, lifecycle and integrations (P1)
 
 - [x] First-party analytics events and funnel view built from recorded demo sessions (#13)
-- [ ] Integrations status with honest `DEMO` / `CONFIGURED` / `CONNECTED_VERIFIED` / `ERROR` states and a `StorePlatformAdapter` Shopify seam (#14)
+- [x] Integrations status with honest `DEMO` / `CONFIGURED` / `CONNECTED_VERIFIED` / `ERROR` states and a `StorePlatformAdapter` Shopify seam (#14)
 - [ ] Consent-gated lifecycle journey previews (welcome, abandoned cart, post-purchase) (#15)
 
 ## M5 — Release readiness (P1)
@@ -46,5 +46,5 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 - [x] Journey 1 — Shopper to order (#7)
 - [x] Journey 2 — Merchant change propagates (#8, advisor part #11)
-- [x] Journey 3 — Order automation is real (#9; verified Shopify webhook delivery, when configured, follows with #14)
+- [x] Journey 3 — Order automation is real (#9; #14 adds webhook signature verification, while receiving Shopify webhooks needs an authorized development store)
 - [x] Journey 4 — AI-enhanced business workflow (#11 advisor, #12 Content Studio)
