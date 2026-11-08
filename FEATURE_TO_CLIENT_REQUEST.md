@@ -1,0 +1,25 @@
+# Feature to client request
+
+If you are planning one of these projects, this shows what you can try in Mero & Moss today and what a real engagement would still need.
+
+**Status terms**
+
+- **Demo:** works end to end here, on synthetic data.
+- **Built, not verified:** the code exists and is tested against a stand-in, but has not been run against the real service.
+- **Phase 2:** not built. It would be scoped as new work.
+
+| If your brief says…                         | Try this                                                                                | Status                                                                                             | Phase 2 for a real store                                                                      |
+| ------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| "Build a polished store from scratch."      | Browse `/collections/all`, filter, choose variants, add to cart and check out.          | Demo: catalog, variants, stock checks, cart, simulated orders.                                     | Real payments through Shopify checkout or another provider, tax, shipping rates, photography. |
+| "Our Shopify store needs a redesign."       | `/admin/upgrade-lab`, **Mobile product page**.                                          | Demo: an illustrative before and after on the live catalog.                                        | Applying the patterns to your theme, with measurements on your own traffic.                   |
+| "Customers can't find the right products."  | `/advisor`, or **Ask an advisor** in the header. Try a budget, a color or a comparison. | Demo: answers from catalog rules, with no API key. Optional Claude wording is built, not verified. | Tuning to your catalog and real search terms.                                                 |
+| "We need a person in the loop for support." | **Talk to a person** on `/advisor`, then **Requests** in the console.                   | Demo: requests are saved. No email is sent.                                                        | Connecting a help desk or email provider.                                                     |
+| "We spend hours handling orders."           | Place an order, then open **Automations** in the console.                               | Demo: durable events, routing, review tags, retries, dead letter, replay.                          | Your real routing rules, fulfilment partner and notification provider.                        |
+| "We need a merchant back office."           | **Orders** and **Products** in the console.                                             | Demo: order status, product edits with change history.                                             | Staff accounts and roles. The console has one merchant login.                                 |
+| "Write our product copy and SEO."           | **Products**, choose a product, **Content Studio**.                                     | Demo: rules-based drafts, factual checks, approval and audit. AI drafts are built, not verified.   | Publishing to your platform, which needs your explicit authorization.                         |
+| "We need email flows."                      | **Lifecycle** in the console, after ticking the opt-in at checkout.                     | Demo: consent-gated previews. Nothing is sent.                                                     | A live provider such as Klaviyo, confirmed opt-in, unsubscribe links.                         |
+| "We need conversion tracking."              | **Analytics** in the console.                                                           | Demo: a funnel from this store's own recorded events, without personal data.                       | Verified GA4 or Meta setup, and a consent banner suited to your markets.                      |
+| "Connect our Shopify store."                | **Integrations** in the console.                                                        | Built, not verified: a read-only adapter and webhook signature check.                              | Full sync, app installation and webhook handling, against your authorized store.              |
+| "We run WooCommerce or a custom shop."      | `src/server/integrations/store-platform.ts`.                                            | Phase 2: there is an adapter boundary, and no WooCommerce connector.                               | Writing that connector.                                                                       |
+
+See [DEMO_TOUR.md](DEMO_TOUR.md) for a guided path, [SERVICE_ADAPTATIONS.md](SERVICE_ADAPTATIONS.md) for how each project would be scoped, and [INTEGRATION_STATUS.md](INTEGRATION_STATUS.md) for the state of each connection.
