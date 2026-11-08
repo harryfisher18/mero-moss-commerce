@@ -10,6 +10,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Issue:** [#17](https://github.com/harryfisher18/mero-moss-commerce/issues/17), the buyer-facing documents.
 - **Added:** `DEMO_TOUR.md`, `FEATURE_TO_CLIENT_REQUEST.md`, `SERVICE_ADAPTATIONS.md` and `INTEGRATION_STATUS.md`. `TEST_RESULTS.md` gains the latest full run and coverage gaps. `tests/e2e/demo-tour.spec.ts` follows the tour step by step, so it fails if the tour stops being true.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (30 files, 303 tests) · `npm run build` pass · `npm run test:e2e` pass (102 tests: 51 specs × desktop/mobile).
+- **PR:** [#46](https://github.com/harryfisher18/mero-moss-commerce/pull/46)
 - **Next:** #38, the admin login query string bug (P2). It is the last open issue.
 
 ## 2026-11-08: Issue #16, accessibility and performance checks
