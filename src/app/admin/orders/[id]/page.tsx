@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ClearReviewButton } from "@/components/admin/clear-review-button";
 import { EventStatusBadge } from "@/components/admin/event-status-badge";
 import { OrderStatusActions } from "@/components/admin/order-status-actions";
 import { OrderStatusBadge } from "@/components/admin/order-status-badge";
 import { formatMoney } from "@/domain/commerce/money";
 import { SHIPPING_REGIONS } from "@/domain/commerce/order";
+import {
+  FULFILLMENT_READINESS_LABELS,
+  fulfillmentPreview,
+  reviewBlocksTransition,
+} from "@/domain/commerce/order-review";
 import { allowedTransitions, STATUS_LABELS } from "@/domain/commerce/order-status";
 import { tagLabel } from "@/domain/events/order-created";
 import { EVENT_TYPE_LABELS } from "@/domain/events/outbox";
@@ -41,6 +47,9 @@ async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
   if (!result) notFound();
   const { order, events } = result;
   const automation = automationService().forOrder(order.id);
+  const service = merchantOrders();
+  const review = service.review(order.id);
+  const preview = fulfillmentPreview(order, service.tags(order.id), review);
   const address = order.shippingAddress;
 
   return (
@@ -114,9 +123,74 @@ async function OrderDetail({ params }: { params: Promise<{ id: string }> }) {
             <OrderStatusActions
               key={order.status}
               orderId={order.id}
-              targets={[...allowedTransitions(order.status)]}
+              targets={allowedTransitions(order.status).filter(
+                (to) => !reviewBlocksTransition(review, to),
+              )}
             />
           </section>
+
+          {review.kind !== "not_needed" && (
+            <section
+              aria-labelledby="review-heading"
+              className="rounded-sm border border-clay bg-white p-4 text-sm"
+              data-testid="order-review"
+            >
+              <h2 id="review-heading" className="font-medium">
+                Review
+              </h2>
+              <ul className="mt-2 space-y-1">
+                {review.tags.map((tag) => (
+                  <li key={tag}>{tagLabel(tag)}</li>
+                ))}
+              </ul>
+              {review.kind === "held" ? (
+                <>
+                  <p className="mt-2 text-muted">
+                    Automation held this order. It can&rsquo;t start processing until someone checks
+                    it.
+                  </p>
+                  <ClearReviewButton orderId={order.id} />
+                </>
+              ) : (
+                <p className="mt-2 text-muted">
+                  Reviewed by {review.clearance.clearedBy},{" "}
+                  {dateFormat.format(new Date(review.clearance.clearedAt))} UTC
+                </p>
+              )}
+            </section>
+          )}
+
+          {preview && (
+            <section
+              aria-labelledby="fulfillment-heading"
+              className="rounded-sm border border-line bg-white p-4 text-sm"
+              data-testid="fulfillment-preview"
+            >
+              <h2 id="fulfillment-heading" className="font-medium">
+                Fulfillment preview
+              </h2>
+              <p className="mt-2 font-medium" data-testid="fulfillment-readiness">
+                {FULFILLMENT_READINESS_LABELS[preview.readiness]}
+              </p>
+              <p className="text-muted">
+                {preview.routeTag ? `${tagLabel(preview.routeTag)} · ` : ""}
+                To {preview.destination} · {preview.totalUnits}{" "}
+                {preview.totalUnits === 1 ? "unit" : "units"}
+              </p>
+              <ul className="mt-2 space-y-1">
+                {preview.pickList.map((item) => (
+                  <li key={item.sku}>
+                    {item.quantity} × {item.title}
+                    {item.variantTitle ? ` (${item.variantTitle})` : ""}
+                    <span className="block text-xs text-muted">SKU {item.sku}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs text-muted">
+                Preview only. Nothing is sent to a warehouse or carrier.
+              </p>
+            </section>
+          )}
 
           <section
             aria-labelledby="automation-heading"

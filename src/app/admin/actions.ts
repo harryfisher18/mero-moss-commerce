@@ -93,7 +93,9 @@ export async function transitionOrder(
       message:
         result.reason === "not_found"
           ? "This order no longer exists."
-          : "That status change is not allowed from the order's current status.",
+          : result.reason === "needs_review"
+            ? "This order is held for review. Mark it as reviewed first."
+            : "That status change is not allowed from the order's current status.",
     };
   }
   return { status: "success", message: "Order status updated." };
@@ -453,4 +455,24 @@ export async function withdrawMarketingConsent(
   return new LifecycleService(getDatabase()).withdrawConsent(input.data.email)
     ? { status: "success", message: "Consent withdrawn." }
     : { status: "error", message: "That consent was already withdrawn." };
+}
+
+const clearReviewSchema = z.object({ orderId: z.uuid() });
+
+export async function clearOrderReview(
+  _previous: TransitionState,
+  formData: FormData,
+): Promise<TransitionState> {
+  const session = await requireMerchant();
+  const input = clearReviewSchema.safeParse({ orderId: formData.get("orderId") });
+  if (!input.success) return { status: "error", message: "That request was not valid." };
+  const result = merchantOrders().clearReview(input.data.orderId, session.email);
+  if (result.ok) return { status: "success", message: "Order reviewed." };
+  return {
+    status: "error",
+    message:
+      result.reason === "not_found"
+        ? "This order no longer exists."
+        : "This order is not waiting for review.",
+  };
 }

@@ -337,4 +337,17 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+
+  {
+    version: 11,
+    name: "order_reviews",
+    sql: `
+      -- Who released an order that automation flagged for review.
+      CREATE TABLE order_reviews (
+        order_id   TEXT PRIMARY KEY REFERENCES orders(id) ON DELETE CASCADE,
+        cleared_by TEXT NOT NULL,
+        cleared_at TEXT NOT NULL
+      );
+    `,
+  },
 ];

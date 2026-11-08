@@ -44,7 +44,7 @@ Open [/advisor](http://localhost:3000/advisor) (also linked from the header, pro
 
 Open [/admin](http://localhost:3000/admin) to:
 
-- **Orders:** list and filter simulated orders, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks).
+- **Orders:** list and filter simulated orders, view detail and history, and move them through placed → processing → fulfilled, or cancel (which restocks). Orders that automation flags wait in a **Needs review** queue and can't start processing until someone clears them. Each order has a fulfillment preview with its routing and pick list; nothing is sent to a warehouse.
 - **Products:** edit title, copy, status, price, compare-at price and stock per variant. Changes reach the storefront, cart and checkout on the next request, and every changed field is recorded in the product's change history.
 - **Automations:** every order writes an `order.created` event in the same transaction as the order. A worker routes it to a ship zone, flags high-value and bulk orders for review, and records notification previews. **Nothing is sent.** The job log shows each event's status, attempts, redacted payload and previews. Replay is idempotent, failures retry with bounded exponential backoff (10 s, 20 s, 40 s, 1 min 20 s), and the event moves to a dead letter queue after 5 attempts. Two labelled failure drills show retries and dead-lettering on demand.
 - **Requests:** "Talk to a person" requests from the shopping advisor, plus the advisor's assisted-wording integration state.
