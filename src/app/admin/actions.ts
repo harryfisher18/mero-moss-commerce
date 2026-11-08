@@ -8,6 +8,7 @@ import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
 import { safeAdminPath } from "@/domain/merchant/navigation";
 import { automationService } from "@/server/automation";
+import { checkShopifyConnection } from "@/server/store-platform";
 import { contentStudio } from "@/server/content-studio";
 import {
   endMerchantSession,
@@ -402,4 +403,19 @@ export async function decideContentDraft(
     case "not_found":
       return { status: "error", message: "This draft no longer exists." };
   }
+}
+
+export interface IntegrationActionState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+}
+
+/** Used with useActionState. Runs read-only queries against the configured store. */
+export async function verifyShopifyConnection(): Promise<IntegrationActionState> {
+  await requireMerchant();
+  const result = await checkShopifyConnection();
+  if (!result) return { status: "error", message: "Shopify is not fully configured." };
+  return result.state === "CONNECTED_VERIFIED"
+    ? { status: "success", message: "Connection verified." }
+    : { status: "error", message: "The connection could not be verified." };
 }
