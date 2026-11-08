@@ -4,6 +4,21 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #10, Upgrade Lab (M2)
+
+- **Previous cycle:** #36 merged as `83a1efb` (PR #37) through auto-merge.
+- **Issue:** [#10](https://github.com/harryfisher18/mero-moss-commerce/issues/10), illustrative before/after for the product page, discovery and order operations.
+- **Implemented:**
+  - Domain (`src/domain/upgrade-lab`, pure): the three "before" behaviours (a fixed "From" price with a late, vague sold-out error; whole-phrase title search; an unstructured order note with personal data masked), a sample order for stores with no orders, a manual-triage check, and URL validation with zod.
+  - `/admin/upgrade-lab`, with a nav link and three tabs:
+    - Mobile product page: the same catalog product in two phone frames, with the "after" using the store's real variant, price and stock rules. Neither side changes a real cart.
+    - Product discovery: one question through title search and the deterministic advisor, so no model is called.
+    - Order operations: a recent real order as a note with a manual decision, against the real routing, review tags and notification previews, linking to the order's job log.
+  - Every comparison is labelled illustrative. "Measure these panels" reads control counts and sizes from the rendered DOM and says so; there are no uplift, conversion or speed figures.
+- **Found, not fixed here:** signing in loses the query string of the requested admin page. Filed as #38.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (22 files, 221 tests) · `npm run build` pass · `npm run test:e2e` pass (74 tests: 37 specs × desktop/mobile) · `next dev` smoke check pass with no API key (lab 307 to login when signed out; the storefront does not mention it).
+- **Next:** #13, first-party analytics events and funnel view (P1).
+
 ## 2026-11-08: Issue #36, bring this log up to date after the history rewrites (docs)
 
 - **Previous change:** #34 merged as `f53d8ad` (PR #35).
