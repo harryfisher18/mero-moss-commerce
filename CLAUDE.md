@@ -83,7 +83,7 @@ Never weaken, skip, or delete checks or tests to get green. Fix the root cause.
 
 - Default branch: `main`. Never commit directly to `main` after the initial bootstrap. All work goes through a PR.
 - Branches: `feat/issue-<n>-<slug>`, `fix/issue-<n>-<slug>`, `chore/issue-<n>-<slug>`, `docs/issue-<n>-<slug>`.
-- Commits: Conventional Commits (`feat(storefront): ...`, `fix(cart): ...`, `test: ...`, `ci: ...`, `docs: ...`, `chore: ...`). Commit author is the repository owner (harryfisher18), with no `Co-authored-by` trailers on any commit, including squash-merge commits. Never add Claude/AI attribution.
+- Commits: Conventional Commits (`feat(storefront): ...`, `fix(cart): ...`, `test: ...`, `ci: ...`, `docs: ...`, `chore: ...`). Commit author is the repository owner (harryfisher18). Every commit, including squash-merge commits, ends with two co-author trailers: `Co-authored-by: Harry Fisher <harryfisher1890@gmail.com>` and `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Add no other co-authors, and no AI attribution in PR descriptions.
 - PRs: summary, `Closes #<n>`, tests performed with results, risks and follow-ups. Squash-merge and delete the branch.
 - Git transport: SSH via the host alias `github-harry` (identity `harryfisher18`, the repository owner). The `gh` CLI must be the **harryfisher18** account for labels, protections and merges. Check with `gh api user --jq .login` and switch with `gh auth switch --user harryfisher18`.
 - Never force-push to `main`, bypass protections with admin rights, fake approvals, or disable checks.
