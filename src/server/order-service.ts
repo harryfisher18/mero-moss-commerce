@@ -8,11 +8,13 @@ import {
 } from "@/domain/commerce/order";
 import { orderCreatedPayload } from "@/domain/events/order-created";
 import { RETRY_POLICY } from "@/domain/events/retry-policy";
+import { normalizeEmail } from "@/domain/lifecycle/journeys";
 import { isCartId } from "@/server/cart-service";
 import { type Database, withTransaction } from "@/server/db/database";
 import { SqliteAutomationRepository } from "@/server/repositories/automation-repository";
 import { SqliteCartRepository } from "@/server/repositories/cart-repository";
 import { SqliteCatalogRepository } from "@/server/repositories/catalog-repository";
+import { SqliteLifecycleRepository } from "@/server/repositories/lifecycle-repository";
 import { SqliteOrderRepository } from "@/server/repositories/order-repository";
 
 export type PlaceOrderResult =
@@ -39,6 +41,7 @@ export class OrderService {
   private readonly catalog: SqliteCatalogRepository;
   private readonly orders: SqliteOrderRepository;
   private readonly outbox: SqliteAutomationRepository;
+  private readonly lifecycle: SqliteLifecycleRepository;
 
   constructor(
     private readonly db: Database,
@@ -49,6 +52,7 @@ export class OrderService {
     this.catalog = new SqliteCatalogRepository(db);
     this.orders = new SqliteOrderRepository(db);
     this.outbox = new SqliteAutomationRepository(db);
+    this.lifecycle = new SqliteLifecycleRepository(db);
   }
 
   placeOrder(cartId: string | undefined, details: CheckoutDetails): PlaceOrderResult {
@@ -99,6 +103,9 @@ export class OrderService {
 
         const order = this.orders.getById(id);
         if (!order) throw new Error("Order was not persisted");
+        if (details.marketingConsent === "yes") {
+          this.lifecycle.grantConsent(normalizeEmail(details.email), "checkout", order.createdAt);
+        }
         // Transactional outbox: the event commits or rolls back together with the order.
         this.outbox.enqueue({
           id: this.newId(),

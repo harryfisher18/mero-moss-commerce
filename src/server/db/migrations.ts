@@ -300,4 +300,41 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX analytics_events_session_idx ON analytics_events(session_id, id);
     `,
   },
+
+  {
+    version: 10,
+    name: "lifecycle_journeys",
+    sql: `
+      -- Explicit marketing opt-ins. Addresses are stored in lowercase.
+      CREATE TABLE marketing_consents (
+        email        TEXT PRIMARY KEY,
+        status       TEXT NOT NULL CHECK (status IN ('granted', 'withdrawn')),
+        source       TEXT NOT NULL CHECK (source IN ('checkout', 'cart_reminder')),
+        granted_at   TEXT NOT NULL,
+        withdrawn_at TEXT
+      );
+
+      -- Who asked to be reminded about a cart. Removed with the cart.
+      CREATE TABLE cart_contacts (
+        cart_id    TEXT PRIMARY KEY REFERENCES carts(id) ON DELETE CASCADE,
+        email      TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+
+      -- Previews and skip decisions. Skips store no email. Nothing here is ever sent.
+      CREATE TABLE lifecycle_messages (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        journey    TEXT NOT NULL CHECK (journey IN ('welcome', 'abandoned_cart', 'post_purchase')),
+        dedupe_key TEXT NOT NULL UNIQUE,
+        email      TEXT,
+        reference  TEXT NOT NULL,
+        status     TEXT NOT NULL
+                     CHECK (status IN ('previewed', 'skipped_no_consent', 'skipped_empty')),
+        subject    TEXT NOT NULL DEFAULT '',
+        body       TEXT NOT NULL DEFAULT '',
+        delivery   TEXT NOT NULL DEFAULT 'preview_only' CHECK (delivery = 'preview_only'),
+        created_at TEXT NOT NULL
+      );
+    `,
+  },
 ];

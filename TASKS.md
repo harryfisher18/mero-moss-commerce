@@ -35,7 +35,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 - [x] First-party analytics events and funnel view built from recorded demo sessions (#13)
 - [x] Integrations status with honest `DEMO` / `CONFIGURED` / `CONNECTED_VERIFIED` / `ERROR` states and a `StorePlatformAdapter` Shopify seam (#14)
-- [ ] Consent-gated lifecycle journey previews (welcome, abandoned cart, post-purchase) (#15)
+- [x] Consent-gated lifecycle journey previews (welcome, abandoned cart, post-purchase) (#15)
 
 ## M5 — Release readiness (P1)
 

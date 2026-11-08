@@ -35,15 +35,19 @@ export async function addToCart(page: Page, path: string, quantity: number) {
 }
 
 /** Completes the demo checkout from a non-empty cart and returns the order number. */
-export async function checkout(page: Page): Promise<string> {
+export async function checkout(
+  page: Page,
+  options: { email?: string; marketingConsent?: boolean } = {},
+): Promise<string> {
   await page.goto("/checkout");
   const form = visible(page, "checkout-form");
-  await form.getByLabel("Email").fill("avery@example.com");
+  await form.getByLabel("Email", { exact: true }).fill(options.email ?? "avery@example.com");
   await form.getByLabel("Full name").fill("Avery Stone");
   await form.getByLabel("Address", { exact: true }).fill("12 Elm Street");
   await form.getByLabel("City").fill("Portland");
   await form.getByLabel("State").selectOption("OR");
   await form.getByLabel("ZIP code").fill("97205");
+  if (options.marketingConsent) await form.getByLabel(/Email me about new pieces/).check();
   await form.getByLabel(/I understand this is a simulated order/).check();
   await form.getByRole("button", { name: "Place simulated order" }).click();
   await expect(page).toHaveURL(/\/checkout\/confirmation$/);

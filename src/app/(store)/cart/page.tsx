@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CartLineControls } from "@/components/store/cart-line-controls";
+import { CartReminderForm } from "@/components/store/cart-reminder-form";
 import { type LineIssue, SHIPPING_RULE } from "@/domain/commerce/cart";
 import { formatMoney, money } from "@/domain/commerce/money";
 import { getCurrentCart } from "@/server/cart-session";
@@ -167,6 +168,7 @@ async function CartContents() {
             Ask our shopping advisor
           </Link>
         </p>
+        <CartReminderForm />
       </aside>
     </div>
   );

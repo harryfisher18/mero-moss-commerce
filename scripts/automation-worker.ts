@@ -10,13 +10,16 @@
  */
 import { AutomationService } from "../src/server/automation-service";
 import { openDatabase, resolveDbPath } from "../src/server/db/database";
+import { LifecycleService } from "../src/server/lifecycle-service";
 
 const POLL_INTERVAL_MS = 2_000;
 
 const db = openDatabase(resolveDbPath());
 const worker = new AutomationService(db);
+const lifecycle = new LifecycleService(db);
 
 function tick(): void {
+  lifecycle.sweepAbandonedCarts();
   const summary = worker.runDue();
   if (summary.processed > 0) {
     console.log(

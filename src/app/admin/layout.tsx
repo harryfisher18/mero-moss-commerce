@@ -53,6 +53,9 @@ async function SignedInNav() {
       <Link href="/admin/support" className="hover:underline">
         Requests
       </Link>
+      <Link href="/admin/lifecycle" className="hover:underline">
+        Lifecycle
+      </Link>
       <Link href="/admin/integrations" className="hover:underline">
         Integrations
       </Link>
