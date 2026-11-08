@@ -17,6 +17,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - Every comparison is labelled illustrative. "Measure these panels" reads control counts and sizes from the rendered DOM and says so; there are no uplift, conversion or speed figures.
 - **Found, not fixed here:** signing in loses the query string of the requested admin page. Filed as #38.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (22 files, 221 tests) · `npm run build` pass · `npm run test:e2e` pass (74 tests: 37 specs × desktop/mobile) · `next dev` smoke check pass with no API key (lab 307 to login when signed out; the storefront does not mention it).
+- **PR:** [#39](https://github.com/harryfisher18/mero-moss-commerce/pull/39)
 - **Next:** #13, first-party analytics events and funnel view (P1).
 
 ## 2026-11-08: Issue #36, bring this log up to date after the history rewrites (docs)
