@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { cartItemCount, rejectionMessage } from "@/domain/commerce/cart";
 import { MAX_QUANTITY_PER_LINE } from "@/domain/commerce/variant-selection";
+import { trackAddToCart } from "@/server/analytics";
 import { cartService, readCartId, writeCartId } from "@/server/cart-session";
 
 /**
@@ -59,6 +60,7 @@ export async function addToCart(
   }
 
   await writeCartId(cartId);
+  await trackAddToCart(input.data.variantId, input.data.quantity);
   const count = cartItemCount(result.lines);
   return {
     status: "success",

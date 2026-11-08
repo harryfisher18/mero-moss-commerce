@@ -7,6 +7,8 @@ export const DEMO_MERCHANT = { email: "merchant@meroandmoss.example", password: 
 
 export function query<T>(fn: (db: DatabaseSync) => T): T {
   const db = new DatabaseSync(E2E_DB_PATH);
+  // The app writes in the background (analytics beacons), so wait as the server does.
+  db.exec("PRAGMA busy_timeout = 5000;");
   try {
     return fn(db);
   } finally {

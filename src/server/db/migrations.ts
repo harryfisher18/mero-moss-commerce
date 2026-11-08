@@ -279,4 +279,25 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX content_drafts_product_idx ON content_drafts(product_id, version);
     `,
   },
+
+  {
+    version: 9,
+    name: "analytics_events",
+    sql: `
+      -- Funnel events. An anonymous session id and catalog facts only: no personal data,
+      -- and no cart or order id that could link an event back to a person.
+      CREATE TABLE analytics_events (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id  TEXT NOT NULL,
+        name        TEXT NOT NULL
+                      CHECK (name IN ('view_item', 'add_to_cart', 'begin_checkout', 'purchase')),
+        product_id  TEXT,
+        quantity    INTEGER CHECK (quantity IS NULL OR quantity > 0),
+        value_minor INTEGER CHECK (value_minor IS NULL OR value_minor >= 0),
+        currency    TEXT,
+        created_at  TEXT NOT NULL
+      );
+      CREATE INDEX analytics_events_session_idx ON analytics_events(session_id, id);
+    `,
+  },
 ];

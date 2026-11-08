@@ -13,6 +13,7 @@ import { getProduct, getProducts, getStorePolicies } from "@/server/catalog";
 import { AddToCartForm } from "./add-to-cart-form";
 import { ProductArt } from "./product-art";
 import { ProductCard } from "./product-card";
+import { TrackEvent } from "./track-event";
 
 type RawParams = Record<string, string | string[] | undefined>;
 
@@ -45,6 +46,7 @@ export async function ProductView({
 
   return (
     <>
+      <TrackEvent name="view_item" productHandle={product.handle} />
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <ol className="flex flex-wrap gap-2">
           <li>
