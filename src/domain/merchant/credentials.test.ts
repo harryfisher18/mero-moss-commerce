@@ -7,7 +7,12 @@ import {
   LOGIN_RATE_LIMIT,
   verifyPassword,
 } from "./credentials";
-import { safeAdminPath } from "./navigation";
+import {
+  adminLoginDestination,
+  DEFAULT_ADMIN_PATH,
+  MAX_ADMIN_PATH_LENGTH,
+  safeAdminPath,
+} from "./navigation";
 
 describe("password hashing", () => {
   it("verifies the right password and rejects others", () => {
@@ -64,6 +69,49 @@ describe("order status transitions", () => {
 });
 
 describe("safeAdminPath", () => {
+  it("keeps a query string on console paths", () => {
+    expect(safeAdminPath("/admin/orders?status=cancelled")).toBe("/admin/orders?status=cancelled");
+    expect(safeAdminPath("/admin/upgrade-lab?lab=discovery&q=Travel%20gifts%20under%20%2450")).toBe(
+      "/admin/upgrade-lab?lab=discovery&q=Travel%20gifts%20under%20%2450",
+    );
+    // A URL inside a query value is data, not a destination.
+    expect(safeAdminPath("/admin/orders?ref=https://other.example//x")).toBe(
+      "/admin/orders?ref=https://other.example//x",
+    );
+  });
+
+  it.each([
+    "https://evil.example/admin/orders?a=1",
+    "//evil.example/admin/orders?a=1",
+    "/\\evil.example/admin?a=1",
+    "/admin//evil.example?a=1",
+    "/admin/orders?a=\\b",
+    "/admin/orders?a=1#fragment",
+    "/admin/orders?a=b c",
+    "/admin/orders?a=\u0000",
+    "/admin/orders?a=\r\nLocation:https://evil.example",
+    "/admin/login?next=/admin/orders",
+    "/shop?next=/admin/orders",
+  ])("refuses an unsafe destination with a query: %j", (bad) => {
+    expect(safeAdminPath(bad)).toBe(DEFAULT_ADMIN_PATH);
+  });
+
+  it("refuses a destination over the length limit", () => {
+    expect(safeAdminPath(`/admin/orders?a=${"x".repeat(MAX_ADMIN_PATH_LENGTH)}`)).toBe(
+      DEFAULT_ADMIN_PATH,
+    );
+  });
+
+  it("builds the post-login destination, dropping only an oversized query", () => {
+    expect(adminLoginDestination("/admin/orders", "")).toBe("/admin/orders");
+    expect(adminLoginDestination("/admin/orders", "?status=placed")).toBe(
+      "/admin/orders?status=placed",
+    );
+    expect(adminLoginDestination("/admin/orders", `?q=${"x".repeat(MAX_ADMIN_PATH_LENGTH)}`)).toBe(
+      "/admin/orders",
+    );
+  });
+
   it("keeps console paths and rejects everything else", () => {
     expect(safeAdminPath("/admin/orders/abc-123")).toBe("/admin/orders/abc-123");
     for (const bad of [
@@ -72,7 +120,6 @@ describe("safeAdminPath", () => {
       "/admin//evil.example",
       "/cart",
       "/admin/login",
-      "/admin/orders?next=https://evil.example",
       undefined,
       42,
     ]) {

@@ -4,6 +4,15 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #38, admin login keeps the requested page's query (bug, P2)
+
+- **Previous cycle:** #17 merged as `49f752d` (PR #46) through auto-merge.
+- **Issue:** [#38](https://github.com/harryfisher18/mero-moss-commerce/issues/38), signing in dropped the query string of the requested admin page.
+- **Fix:** Proxy now carries the query through the login redirect. `safeAdminPath` allows a query on console paths and still refuses absolute URLs, protocol-relative paths, backslashes, fragments, whitespace and control characters. A very long destination no longer blocks sign-in: the query is dropped or the default page is used.
+- **Changed test:** one existing case expected any query to be refused. That was the behaviour being changed, so it moved out of the refused list, and hostile queries are now tested explicitly.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (30 files, 317 tests) · `npm run build` pass · `npm run test:e2e` pass (106 tests: 53 specs × desktop/mobile).
+- **Next:** #47, sample webhook events and deployment notes (P2).
+
 ## 2026-11-08: Issue #17, buyer-facing docs
 
 - **Previous cycle:** #16 merged as `b47ada1` (PR #45) through auto-merge.
