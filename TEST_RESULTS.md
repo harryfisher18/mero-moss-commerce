@@ -2,6 +2,20 @@
 
 What has actually been run against Mero & Moss, and what those runs do not prove. CI repeats the automated checks on every pull request and on `main`.
 
+## Latest full run
+
+Run on 2026-11-08 on Windows, on the branch for issue #17, based on `b47ada1`.
+
+| Command             | What it covers                                         | Result                                   |
+| ------------------- | ------------------------------------------------------ | ---------------------------------------- |
+| `npm run lint`      | ESLint and Prettier                                    | Pass                                     |
+| `npm run typecheck` | Strict TypeScript                                      | Pass                                     |
+| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 303 tests in 30 files              |
+| `npm run build`     | Production build                                       | Pass                                     |
+| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 102 tests (51 specs on 2 projects) |
+
+The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR.md](DEMO_TOUR.md), and the accessibility scans below.
+
 ## Accessibility (axe)
 
 `tests/e2e/accessibility.spec.ts` runs [axe-core](https://github.com/dequelabs/axe-core) through Playwright against WCAG 2.0, 2.1 and 2.2 level A and AA rules, on desktop and mobile Chromium, as part of `npm run test:e2e`.
@@ -62,3 +76,13 @@ These runs also changed the product. Fixed as a result:
 **Known result:** the product page's SEO score is held back by `meta-description`. Its description depends on live catalog data, so Next.js streams it. A check of the served HTML found it in the `<head>` for Bingbot, and in the streamed page rather than the `<head>` for a regular browser and for Googlebot.
 
 **Limits:** these are lab results from a demo with synthetic data, served from localhost with no CDN and no images beyond inline artwork. They do not predict field performance or any business result.
+
+## Coverage gaps
+
+- **External services:** Shopify and Claude have only been tested against stand-ins. See [INTEGRATION_STATUS.md](INTEGRATION_STATUS.md).
+- **Integration states:** the `CONFIGURED`, `CONNECTED_VERIFIED` and `ERROR` displays are covered by unit tests of their logic. The browser tests run with no credentials, so they see `DEMO` only.
+- **Browsers:** Chromium only. Safari and Firefox have not been tested.
+- **Assistive technology:** no manual screen-reader or keyboard audit.
+- **Load:** no load or concurrency testing beyond first-open database safety. The demo runs on SQLite on one server.
+- **Deployment:** no production deployment has been made or tested.
+- **Known bug:** signing in drops the query string of the requested admin page ([#38](https://github.com/harryfisher18/mero-moss-commerce/issues/38)).

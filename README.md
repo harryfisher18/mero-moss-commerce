@@ -83,6 +83,11 @@ A single Next.js 16 App Router application in strict TypeScript, with pure domai
 
 ## Project documents
 
+- [DEMO_TOUR.md](DEMO_TOUR.md): a guided path through the product, about five minutes
+- [FEATURE_TO_CLIENT_REQUEST.md](FEATURE_TO_CLIENT_REQUEST.md): what you can try for each kind of project
+- [SERVICE_ADAPTATIONS.md](SERVICE_ADAPTATIONS.md): what exists and what would be built for each project
+- [INTEGRATION_STATUS.md](INTEGRATION_STATUS.md): the real state of every connection
+- [TEST_RESULTS.md](TEST_RESULTS.md): what has been run, and the coverage gaps
 - [PROJECT_BRIEF.md](PROJECT_BRIEF.md): product promise, target buyers, non-goals
 - [TASKS.md](TASKS.md): milestones and status
 - [docs/DEVLOG.md](docs/DEVLOG.md): development log
