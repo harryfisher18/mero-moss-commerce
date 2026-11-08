@@ -25,6 +25,30 @@ These scans changed the product. Fixed as a result:
 `npm run build && npm run perf` runs Lighthouse three times per page against the production build. The job also runs in CI and publishes the same report on each run. It is not a required check, because lab timings vary between machines. It fails if accessibility is below 100 or layout shift is above 0.1.
 
 <!-- lighthouse:start -->
+
+| Page                        | Performance | Accessibility | Best practices | SEO | FCP   | LCP   | TBT   | CLS   |
+| --------------------------- | ----------- | ------------- | -------------- | --- | ----- | ----- | ----- | ----- |
+| `/`                         | 100         | 100           | 100            | 100 | 1.1 s | 1.1 s | 73 ms | 0.000 |
+| `/collections/all`          | 100         | 100           | 100            | 100 | 0.9 s | 0.9 s | 39 ms | 0.000 |
+| `/products/brass-task-lamp` | 100         | 100           | 100            | 90  | 0.8 s | 0.8 s | 85 ms | 0.000 |
+
+Median of 3 runs per page, by performance score.
+
+Audits not fully passing (best practices and SEO):
+
+- `/`: none
+- `/collections/all`: none
+- `/products/brass-task-lamp`: meta-description
+
+- **Commit:** `d96ae64`
+- **Measured:** 2026-11-08T12:28:24.223Z
+- **Tool:** Lighthouse 13.6.0, default mobile configuration
+- **Device:** mobile emulation, 412×823 at 1.75x
+- **Network and CPU:** simulate throttling: 150 ms RTT, 1638 Kbps down, 4x CPU slowdown
+- **Browser:** Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36
+- **Host:** win32, 8 CPUs, local machine
+- **Target:** production build served from localhost with the seeded demo database and no CDN
+
 <!-- lighthouse:end -->
 
 The commit above is the pull request's branch commit from before its squash merge.
