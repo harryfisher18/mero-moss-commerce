@@ -8,6 +8,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 - **Previous change:** #32 was merged, and the owner then authorized a one-off rewrite of `main` that removed the earlier mentor trailers. `main` was at `0da882d` afterwards, so commit IDs cited in older entries of this log predate that rewrite.
 - **Change:** at the owner's request, every new commit and squash merge carries `Co-authored-by` trailers for Harry Fisher and Claude. `CLAUDE.md` and the `/pr-test` workflow are updated. Existing commits are unchanged.
+- **PR:** [#35](https://github.com/harryfisher18/mero-moss-commerce/pull/35)
 - **Checks:** `npm run lint` pass (docs only, no code changes).
 - **Next:** #10, Upgrade Lab (P1).
 
