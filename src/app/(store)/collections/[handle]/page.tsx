@@ -70,6 +70,28 @@ function CollectionSkeleton() {
   );
 }
 
+/** Holds the space the results will take, so the page does not jump when they stream in. */
+function ResultsSkeleton() {
+  return (
+    <div className="mt-8 grid gap-8 lg:grid-cols-[15rem_1fr]">
+      <p className="sr-only">Loading products…</p>
+      <div aria-hidden="true" className="h-14 animate-pulse rounded-sm bg-line/60 lg:h-96" />
+      <div aria-hidden="true">
+        <div className="h-5 w-24 animate-pulse rounded-sm bg-line/60" />
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div key={index}>
+              <div className="aspect-square animate-pulse rounded-sm bg-line/60" />
+              <div className="mt-3 h-5 w-3/4 animate-pulse rounded-sm bg-line/60" />
+              <div className="mt-2 h-10 animate-pulse rounded-sm bg-line/60" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 async function CollectionContent({
   params,
   searchParams,
@@ -121,7 +143,7 @@ async function CollectionContent({
         </ul>
       </nav>
 
-      <Suspense fallback={<p className="mt-10 text-muted">Loading products…</p>}>
+      <Suspense fallback={<ResultsSkeleton />}>
         <CollectionResults
           basePath={`/collections/${info.handle}`}
           categoryHandle={info.handle === ALL ? undefined : info.handle}

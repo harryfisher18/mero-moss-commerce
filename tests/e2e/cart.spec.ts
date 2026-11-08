@@ -28,7 +28,7 @@ test.describe("cart", () => {
     await expect(addForm(page).getByRole("status")).toContainText(
       "Added to your cart. You now have 2 items.",
     );
-    await expect(headerCart(page)).toHaveAttribute("aria-label", "Cart, 2 items");
+    await expect(headerCart(page)).toHaveAttribute("aria-label", "Cart 2 items");
 
     await addForm(page).getByRole("link", { name: "View cart" }).click();
     await expect(page).toHaveURL(/\/cart$/);
@@ -51,14 +51,14 @@ test.describe("cart", () => {
 
     await page.reload();
     await expect(summary(page).getByTestId("cart-subtotal")).toHaveText("$58.00");
-    await expect(headerCart(page)).toHaveAttribute("aria-label", "Cart, 1 item");
+    await expect(headerCart(page)).toHaveAttribute("aria-label", "Cart 1 item");
 
     await page
       .locator("[data-testid=cart-line]:visible")
       .getByRole("button", { name: /Remove/ })
       .click();
     await expect(page.getByText("Your cart is empty.")).toBeVisible();
-    await expect(headerCart(page)).toHaveAttribute("aria-label", "Cart, 0 items");
+    await expect(headerCart(page)).toHaveAttribute("aria-label", "Cart 0 items");
   });
 
   test("the server enforces stock even when the browser is bypassed", async ({ page, browser }) => {
