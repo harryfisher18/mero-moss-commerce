@@ -4,6 +4,14 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-08: Issue #32, stop adding the mentor co-author trailer (chore)
+
+- **Previous cycle:** #23 merged as `84b8dea` (PR #31) through auto-merge.
+- **Change:** at the owner's request, `CLAUDE.md` and the `/pr-test` workflow no longer require a `Co-authored-by: Dominik Lubański` trailer. From this commit on, commits and squash merges carry no co-author trailer, and still no AI attribution.
+- **Not changed:** commits merged between PR #21 (`88db869`) and PR #31 (`84b8dea`) still contain the trailer. Removing it would mean rewriting published history on protected `main`, which waits for an explicit decision by the owner.
+- **Checks:** `npm run lint` pass (docs only, no code changes).
+- **Next:** #10, Upgrade Lab (P1).
+
 ## 2026-11-08: Issue #23, collection shell survives path revalidation (bug, P1)
 
 - **Previous cycle:** #12 merged as `885fe0f` (PR #30) through auto-merge. All four mandatory journeys are done.
