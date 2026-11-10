@@ -48,6 +48,8 @@ test.describe("accessibility (axe, WCAG A and AA)", () => {
         "/cart",
         "/checkout",
         "/advisor",
+        "/search?q=linen",
+        "/search?q=velvet%20armchair",
         "/advisor?q=travel%20gifts%20under%20%2450",
         "/advisor?q=What%20is%20your%20return%20policy%3F",
         "/does-not-exist",
