@@ -11,6 +11,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Implemented:** `src/domain/commerce/search.ts` (pure): every query word must match the start of a word in the product's name, tags, category, options, summary or materials, and title matches rank first. Only active products are searched, and descriptions are not, so their free text can't pull in unrelated products. A header search box on every storefront page, and `/search` with results, a prompt for an empty query, and a no-matches state that links to the advisor with the same words.
 - **Local tooling note:** this session's working directory used a lowercase `e:` drive letter, and Vitest failed before running any test ("Cannot read properties of undefined (reading 'config')"). Run from `E:`, all tests pass. CI on Linux is unaffected.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (33 files, 340 tests) · `npm run build` pass · `npm run test:e2e` pass (118 tests: 59 specs × desktop/mobile), including axe scans of both search states · `next dev` smoke check pass.
+- **PR:** [#54](https://github.com/harryfisher18/mero-moss-commerce/pull/54)
 - **Next:** the merchant overview page with recorded, labelled demo metrics.
 
 ## 2026-11-08: Issue #51, order review queue and fulfillment preview
