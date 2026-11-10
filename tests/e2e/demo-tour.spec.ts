@@ -64,6 +64,8 @@ test("the demo tour works exactly as written", async ({ page }) => {
     await login.getByLabel("Email").fill(DEMO_MERCHANT.email);
     await login.getByLabel("Password").fill(DEMO_MERCHANT.password);
     await login.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/admin\/overview$/);
+    await consoleMenu().getByRole("link", { name: "Orders" }).click();
     await expect(page).toHaveURL(/\/admin\/orders$/);
     await expect(page.locator("[data-testid=order-row]:visible").first()).toHaveAttribute(
       "data-order-number",

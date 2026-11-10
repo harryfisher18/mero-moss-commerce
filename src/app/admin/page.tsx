@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
+import { DEFAULT_ADMIN_PATH } from "@/domain/merchant/navigation";
 
-/** The console currently opens on orders; Proxy redirects signed-out visitors to login. */
+/** The console opens on the overview; Proxy redirects signed-out visitors to login. */
 export default function AdminIndexPage() {
-  redirect("/admin/orders");
+  redirect(DEFAULT_ADMIN_PATH);
 }

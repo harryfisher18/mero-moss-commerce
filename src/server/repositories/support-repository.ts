@@ -26,6 +26,12 @@ export class SqliteSupportRepository {
       .run(request.id, request.email, request.message, request.question, request.createdAt);
   }
 
+  count(): number {
+    return z
+      .object({ n: z.number().int() })
+      .parse(this.db.prepare("SELECT COUNT(*) AS n FROM support_requests").get()).n;
+  }
+
   list(limit = 100): SupportRequest[] {
     return this.db
       .prepare(

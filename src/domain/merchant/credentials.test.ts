@@ -123,7 +123,7 @@ describe("safeAdminPath", () => {
       undefined,
       42,
     ]) {
-      expect(safeAdminPath(bad)).toBe("/admin/orders");
+      expect(safeAdminPath(bad)).toBe(DEFAULT_ADMIN_PATH);
     }
   });
 });

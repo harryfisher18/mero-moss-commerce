@@ -20,8 +20,9 @@ Everything here is demo data. Orders are simulated, no payment is taken, and no 
 
 1. Go to <http://localhost:3000/admin>.
 2. Sign in with `merchant@meroandmoss.example` and `moss-demo-2026`.
-3. You land on **Orders**. Your order is at the top. Select its order number.
-4. The **Automation** panel shows the ship zone the order was routed to.
+3. You land on **Overview**: every figure there is counted from the store's data and links to where you can act on it.
+4. In the console menu, select **Orders**. Your order is at the top. Select its order number.
+5. The **Automation** panel shows the ship zone the order was routed to.
 
 ## 3. Watch the automation
 

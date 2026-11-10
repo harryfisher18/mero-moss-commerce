@@ -41,6 +41,9 @@ async function SignedInNav() {
       aria-label="Merchant"
       className="flex w-full flex-wrap items-center gap-x-5 gap-y-2 text-sm md:ml-auto md:w-auto"
     >
+      <Link href="/admin/overview" className="hover:underline">
+        Overview
+      </Link>
       <Link href="/admin/orders" className="hover:underline">
         Orders
       </Link>
