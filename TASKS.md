@@ -46,7 +46,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 
 - [x] Sample webhook events and practical deployment notes (#47)
 - [x] Order review queue and fulfillment preview (#51)
-- [ ] Storefront product search
+- [x] Storefront product search (#53)
 - [ ] Merchant overview page with recorded, labelled demo metrics
 - [ ] Merchant settings and in-console demo reset
 - [ ] Verify the Shopify adapter against an authorized development store (#49, blocked: needs a store and credentials from the owner)
