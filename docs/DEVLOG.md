@@ -4,6 +4,16 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-10: Issue #55, merchant overview
+
+- **Previous cycle:** #53 merged as `8e56719` (PR #54) through auto-merge.
+- **Issue:** [#55](https://github.com/harryfisher18/mero-moss-commerce/issues/55), a merchant overview with recorded, labelled demo metrics.
+- **Implemented:** `src/domain/merchant/overview.ts` (pure): stock alerts and a needs-attention list built only from counts. Order counts by status, the review queue count and the support request count live in their repositories. `/admin/overview` shows each figure as a link to where it can be acted on, labelled as demo data counted just now, with no targets, trends, forecasts or money figures. Signing in, and `/admin`, now land on the overview, and it is first in the console menu.
+- **Updated:** tests and `DEMO_TOUR.md` that assumed sign-in lands on Orders.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (34 files, 343 tests) · `npm run build` pass · `npm run test:e2e` pass (124 tests: 62 specs × desktop/mobile), including every overview figure checked against the database and an axe scan · `next dev` smoke check pass.
+- **PR:** [#56](https://github.com/harryfisher18/mero-moss-commerce/pull/56)
+- **Next:** merchant settings and an in-console demo reset.
+
 ## 2026-11-10: Issue #53, storefront product search
 
 - **Previous cycle:** #51 merged as `78f3e76` (PR #52) through auto-merge.

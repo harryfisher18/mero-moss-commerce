@@ -1,5 +1,5 @@
 /** Where the console lands after sign-in when no valid destination is given. */
-export const DEFAULT_ADMIN_PATH = "/admin/orders";
+export const DEFAULT_ADMIN_PATH = "/admin/overview";
 
 /** Longest destination carried through sign-in. */
 export const MAX_ADMIN_PATH_LENGTH = 2048;

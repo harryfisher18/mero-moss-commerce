@@ -64,6 +64,7 @@ test.describe("accessibility (axe, WCAG A and AA)", () => {
     const orderId = firstId("SELECT id FROM orders ORDER BY rowid DESC LIMIT 1");
     const eventId = firstId("SELECT id FROM outbox_events ORDER BY rowid DESC LIMIT 1");
     const signedIn = await scan(page, [
+      "/admin/overview",
       "/admin/orders",
       "/admin/orders?view=review",
       ...(orderId ? [`/admin/orders/${orderId}`] : []),

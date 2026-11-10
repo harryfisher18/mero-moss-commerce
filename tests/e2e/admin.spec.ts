@@ -23,7 +23,7 @@ test.describe("merchant console", () => {
       await form.getByLabel("Email").fill(DEMO_MERCHANT.email);
       await form.getByLabel("Password").fill(DEMO_MERCHANT.password);
       await form.getByRole("button", { name: "Sign in" }).click();
-      await expect(page).toHaveURL(/localhost:\d+\/admin\/orders$/);
+      await expect(page).toHaveURL(/localhost:\d+\/admin\/overview$/);
       await page.context().clearCookies();
     }
   });

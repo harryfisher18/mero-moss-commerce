@@ -39,6 +39,12 @@ const REGION_CODES = Object.keys(SHIPPING_REGIONS) as [
   ...(keyof typeof SHIPPING_REGIONS)[],
 ];
 
+const HELD_FOR_REVIEW = `o.status = 'placed'
+  AND EXISTS (SELECT 1 FROM order_tags t WHERE t.order_id = o.id AND t.tag LIKE 'review:%')
+  AND NOT EXISTS (SELECT 1 FROM order_reviews r WHERE r.order_id = o.id)`;
+const countRow = z.object({ n: z.number().int() });
+const statusCountRow = z.object({ status: z.enum(ORDER_STATUSES), n: z.number().int() });
+
 const orderRow = z.object({
   id: z.string(),
   order_number: z.string(),
@@ -163,12 +169,27 @@ export class SqliteOrderRepository implements OrderRepository {
 
   /** Placed orders that automation flagged and nobody has cleared yet. */
   listHeldForReview(): OrderSummary[] {
-    return this.summaries(
-      `WHERE o.status = 'placed'
-         AND EXISTS (SELECT 1 FROM order_tags t WHERE t.order_id = o.id AND t.tag LIKE 'review:%')
-         AND NOT EXISTS (SELECT 1 FROM order_reviews r WHERE r.order_id = o.id)`,
-      [],
-    );
+    return this.summaries(`WHERE ${HELD_FOR_REVIEW}`, []);
+  }
+
+  countHeldForReview(): number {
+    return countRow.parse(
+      this.db.prepare(`SELECT COUNT(*) AS n FROM orders o WHERE ${HELD_FOR_REVIEW}`).get(),
+    ).n;
+  }
+
+  countByStatus(): Record<OrderStatus, number> {
+    const counts = Object.fromEntries(ORDER_STATUSES.map((status) => [status, 0])) as Record<
+      OrderStatus,
+      number
+    >;
+    for (const raw of this.db
+      .prepare("SELECT status, COUNT(*) AS n FROM orders GROUP BY status")
+      .all()) {
+      const row = statusCountRow.parse(raw);
+      counts[row.status] = row.n;
+    }
+    return counts;
   }
 
   private summaries(where: string, params: readonly string[]): OrderSummary[] {
