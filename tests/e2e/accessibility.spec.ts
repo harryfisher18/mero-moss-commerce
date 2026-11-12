@@ -77,6 +77,7 @@ test.describe("accessibility (axe, WCAG A and AA)", () => {
       "/admin/lifecycle",
       "/admin/integrations",
       "/admin/analytics",
+      "/admin/settings",
       "/admin/upgrade-lab",
       "/admin/upgrade-lab?lab=discovery&q=storage",
       "/admin/upgrade-lab?lab=orders",

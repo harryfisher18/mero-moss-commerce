@@ -4,15 +4,15 @@ What has actually been run against Mero & Moss, and what those runs do not prove
 
 ## Latest full run
 
-Run on 2026-11-10 on Windows, on the branch for issue #55, based on `8e56719`.
+Run on 2026-11-12 on Windows, on the branch for issue #57, based on `e3fedeb`.
 
 | Command             | What it covers                                         | Result                                   |
 | ------------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `npm run lint`      | ESLint and Prettier                                    | Pass                                     |
 | `npm run typecheck` | Strict TypeScript                                      | Pass                                     |
-| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 343 tests in 34 files              |
+| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 347 tests in 35 files              |
 | `npm run build`     | Production build                                       | Pass                                     |
-| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 124 tests (62 specs on 2 projects) |
+| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 130 tests (65 specs on 2 projects) |
 
 The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR.md](DEMO_TOUR.md), and the accessibility scans below.
 
@@ -20,10 +20,10 @@ The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR
 
 `tests/e2e/accessibility.spec.ts` runs [axe-core](https://github.com/dequelabs/axe-core) through Playwright against WCAG 2.0, 2.1 and 2.2 level A and AA rules, on desktop and mobile Chromium, as part of `npm run test:e2e`.
 
-| Area             | Routes scanned                                                                                                                                                                   | Violations |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| Storefront       | Home, collections (with filters), product, cart, checkout, advisor (empty, products, policy), search (results, no matches), 404                                                  | 0          |
-| Merchant console | Login, overview, orders, order detail, products, product editor, Content Studio, automations, event detail, requests, lifecycle, integrations, analytics, Upgrade Lab (all tabs) | 0          |
+| Area             | Routes scanned                                                                                                                                                                             | Violations |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| Storefront       | Home, collections (with filters), product, cart, checkout, advisor (empty, products, policy), search (results, no matches), 404                                                            | 0          |
+| Merchant console | Login, overview, orders, order detail, products, product editor, Content Studio, automations, event detail, requests, lifecycle, integrations, analytics, Upgrade Lab (all tabs), settings | 0          |
 
 These scans changed the product. Fixed as a result:
 

@@ -60,6 +60,7 @@ Next.js recommends running behind a reverse proxy such as nginx. Pass the origin
 - Keep the database on a local disk, not a network share, because it uses SQLite's WAL mode.
 - Back up with SQLite's online backup, for example `sqlite3 shop.db ".backup backup.db"`. Copying only the main file while the app runs can miss recent writes.
 - `npm run db:reset` **deletes the configured database** and reseeds it. Never run it against data you need.
+- The console's **Settings → Reset demo data** does the same from the browser, but only while the public demo login is active. Once `MERCHANT_EMAIL` and `MERCHANT_PASSWORD_HASH` are set, the form is not shown and the server refuses the reset.
 
 ## Limits
 

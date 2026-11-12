@@ -48,7 +48,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Order review queue and fulfillment preview (#51)
 - [x] Storefront product search (#53)
 - [x] Merchant overview page with recorded, labelled demo metrics (#55)
-- [ ] Merchant settings and in-console demo reset
+- [x] Merchant settings and in-console demo reset (#57)
 - [ ] Verify the Shopify adapter against an authorized development store (#49, blocked: needs a store and credentials from the owner)
 
 ## Mandatory journeys (acceptance gates)
