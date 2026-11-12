@@ -7,7 +7,10 @@ import type { RawProductEdit } from "@/domain/commerce/product-edit";
 import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
 import { MAX_ADMIN_PATH_LENGTH, safeAdminPath } from "@/domain/merchant/navigation";
+import { checkDemoReset } from "@/domain/merchant/settings";
 import { automationService } from "@/server/automation";
+import { resetDemoStore } from "@/server/demo-reset";
+import { merchantCredentials } from "@/server/merchant-config";
 import { getDatabase } from "@/server/db/client";
 import { LifecycleService } from "@/server/lifecycle-service";
 import { checkShopifyConnection } from "@/server/store-platform";
@@ -474,5 +477,43 @@ export async function clearOrderReview(
       result.reason === "not_found"
         ? "This order no longer exists."
         : "This order is not waiting for review.",
+  };
+}
+
+export interface DemoResetState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+}
+
+const resetSchema = z.object({ confirmation: z.string().max(100) });
+
+/**
+ * Wipes and reseeds the store. The demo guard is checked here on the server, so the reset
+ * is refused whenever real merchant credentials are configured, whatever the form sends.
+ */
+export async function resetDemoStoreAction(
+  _previous: DemoResetState,
+  formData: FormData,
+): Promise<DemoResetState> {
+  await requireMerchant();
+  const input = resetSchema.safeParse({ confirmation: formData.get("confirmation") ?? "" });
+  if (!input.success) return { status: "error", message: "That request was not valid." };
+  const check = checkDemoReset({
+    isDemo: merchantCredentials().isDemo,
+    confirmation: input.data.confirmation,
+  });
+  if (!check.ok) {
+    return {
+      status: "error",
+      message:
+        check.reason === "not_demo"
+          ? "Reset is not available for a store with private merchant credentials."
+          : "Type the confirmation phrase exactly to reset.",
+    };
+  }
+  const summary = resetDemoStore(getDatabase());
+  return {
+    status: "success",
+    message: `The demo store was reset: ${String(summary.rowsRemoved)} records removed and the demo catalog restored.`,
   };
 }
