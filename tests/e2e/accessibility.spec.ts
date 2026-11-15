@@ -57,6 +57,21 @@ test.describe("accessibility (axe, WCAG A and AA)", () => {
     ).toEqual([]);
   });
 
+  test("the storefront with a merchant announcement has no violations", async ({ page }) => {
+    query((db) => {
+      db.prepare(
+        "INSERT OR REPLACE INTO store_branding (id, tagline, announcement, updated_at) VALUES (1, ?, ?, ?)",
+      ).run("Kept for years.", "New table and kitchen pieces are in.", new Date().toISOString());
+    });
+    try {
+      expect(await scan(page, ["/"])).toEqual([]);
+    } finally {
+      query((db) => {
+        db.prepare("DELETE FROM store_branding").run();
+      });
+    }
+  });
+
   test("merchant console routes have no violations", async ({ page }) => {
     const signedOut = await scan(page, ["/admin/login"]);
     await signInAsMerchant(page, "/admin/orders");

@@ -4,6 +4,18 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-16: Issue #61, storefront branding in merchant settings
+
+- **Previous cycle:** #59 merged as `a045ace` (PR #60) through auto-merge.
+- **Issue:** [#61](https://github.com/harryfisher18/mero-moss-commerce/issues/61), the "branding" half of "merchant settings and branding" in the product requirements.
+- **Implemented:**
+  - `src/domain/merchant/branding.ts` (pure): defaults and validation. Each field must be a single line of plain text within its length limit, and may not contain any name other than Mero & Moss (CommerceFlow, Studio, Builder and so on). There is also a field diff.
+  - Migration 12 adds `store_branding` (one row) and `branding_changes`. `SqliteBrandingRepository` returns the defaults when nothing is saved, so the demo reset restores the original wording without a seed change.
+  - Storefront: the home headline and footer tagline are read at request time, and an announcement line appears above the header only when set. The home headline's fallback reserves its space without showing stale wording.
+  - `/admin/settings` has a Branding form with a live preview, field errors and a change history. The Server Action re-checks the session and validates with zod.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (37 files, 363 tests) · `npm run build` pass · `npm run test:e2e` pass (134 tests: 67 specs × desktop/mobile). The E2E covers a rejected empty tagline, the preview, the save and history, the storefront headline, announcement and footer, and the return to defaults. It also adds an axe scan of the home page with an announcement · `next dev` smoke check pass.
+- **Next:** #49 still needs a Shopify development store and token from the owner. The remaining audit candidate is a customer FAQ grounded in the stored policies.
+
 ## 2026-11-16: Issue #59, preview product edits before publishing
 
 - **Previous cycle:** #57 merged as `2574e16` (PR #58) through auto-merge.

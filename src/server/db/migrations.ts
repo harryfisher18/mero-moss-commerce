@@ -350,4 +350,27 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+
+  {
+    version: 12,
+    name: "store_branding",
+    sql: `
+      -- Merchant-edited storefront wording. At most one row; without it the defaults apply.
+      CREATE TABLE store_branding (
+        id           INTEGER PRIMARY KEY CHECK (id = 1),
+        tagline      TEXT NOT NULL,
+        announcement TEXT NOT NULL,
+        updated_at   TEXT NOT NULL
+      );
+      -- One row per changed field, for the change history in settings.
+      CREATE TABLE branding_changes (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        field      TEXT NOT NULL CHECK (field IN ('tagline', 'announcement')),
+        before     TEXT NOT NULL,
+        after      TEXT NOT NULL,
+        actor      TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+    `,
+  },
 ];

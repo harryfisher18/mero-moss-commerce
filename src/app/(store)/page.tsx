@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { ProductCard } from "@/components/store/product-card";
+import { HeroTagline, HeroTaglineFallback } from "@/components/store/store-branding";
 import {
   getCategories,
   getFeaturedProducts,
@@ -13,9 +14,9 @@ export default function HomePage() {
     <>
       <section className="mx-auto w-full max-w-6xl px-4 pt-16 pb-12 sm:px-6 sm:pt-24">
         <p className="text-xs tracking-[0.2em] text-muted uppercase">Mero &amp; Moss</p>
-        <h1 className="mt-4 max-w-3xl font-serif text-4xl leading-tight sm:text-6xl">
-          Well-made essentials for everyday living.
-        </h1>
+        <Suspense fallback={<HeroTaglineFallback />}>
+          <HeroTagline />
+        </Suspense>
         <p className="mt-6 max-w-xl text-lg text-muted">
           Considered pieces for home organization, the table and kitchen, the workspace, and travel,
           chosen to be used every day and kept for years.

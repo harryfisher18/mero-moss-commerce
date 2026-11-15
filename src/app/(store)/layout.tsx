@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { DemoNotice } from "@/components/store/demo-notice";
+import { StoreAnnouncement } from "@/components/store/store-branding";
 import { StoreFooter } from "@/components/store/store-footer";
 import { StoreHeader } from "@/components/store/store-header";
 
@@ -12,6 +14,9 @@ export default function StoreLayout({ children }: LayoutProps<"/">) {
         Skip to content
       </a>
       <DemoNotice />
+      <Suspense fallback={null}>
+        <StoreAnnouncement />
+      </Suspense>
       <StoreHeader />
       <main id="main" className="flex-1">
         {children}

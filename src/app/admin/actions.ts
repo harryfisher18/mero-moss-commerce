@@ -7,11 +7,13 @@ import type { AuditChange, RawProductEdit } from "@/domain/commerce/product-edit
 import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
 import { MAX_ADMIN_PATH_LENGTH, safeAdminPath } from "@/domain/merchant/navigation";
+import { type Branding, type BrandingErrors, parseBranding } from "@/domain/merchant/branding";
 import { checkDemoReset } from "@/domain/merchant/settings";
 import { automationService } from "@/server/automation";
 import { resetDemoStore } from "@/server/demo-reset";
 import { merchantCredentials } from "@/server/merchant-config";
 import { getDatabase } from "@/server/db/client";
+import { SqliteBrandingRepository } from "@/server/repositories/branding-repository";
 import { LifecycleService } from "@/server/lifecycle-service";
 import { checkShopifyConnection } from "@/server/store-platform";
 import { contentStudio } from "@/server/content-studio";
@@ -572,5 +574,56 @@ export async function resetDemoStoreAction(
   return {
     status: "success",
     message: `The demo store was reset: ${String(summary.rowsRemoved)} records removed and the demo catalog restored.`,
+  };
+}
+
+export interface BrandingState {
+  readonly status: "idle" | "success" | "error";
+  readonly message: string;
+  readonly errors: BrandingErrors;
+  /** The saved values after a save, or what was typed after an error. */
+  readonly values: Branding | null;
+}
+
+const brandingForm = z.object({
+  tagline: z.string().max(1000),
+  announcement: z.string().max(1000),
+});
+
+/** Saves the storefront tagline and announcement. Each changed field is recorded. */
+export async function saveBrandingAction(
+  _previous: BrandingState,
+  formData: FormData,
+): Promise<BrandingState> {
+  const session = await requireMerchant();
+  const input = brandingForm.safeParse({
+    tagline: formData.get("tagline") ?? "",
+    announcement: formData.get("announcement") ?? "",
+  });
+  if (!input.success) {
+    return { status: "error", message: "That request was not valid.", errors: {}, values: null };
+  }
+  const parsed = parseBranding(input.data);
+  if (!parsed.ok) {
+    return {
+      status: "error",
+      message: "Please fix the highlighted fields.",
+      errors: parsed.errors,
+      values: input.data,
+    };
+  }
+  const changes = new SqliteBrandingRepository(getDatabase()).save(
+    parsed.branding,
+    session.email,
+    new Date().toISOString(),
+  );
+  return {
+    status: "success",
+    message:
+      changes.length === 0
+        ? "No changes to save."
+        : "Saved. The storefront shows the new wording on its next page load.",
+    errors: {},
+    values: parsed.branding,
   };
 }
