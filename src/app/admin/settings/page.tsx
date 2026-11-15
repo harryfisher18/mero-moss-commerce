@@ -2,12 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { BrandingForm } from "@/components/admin/branding-form";
 import { DemoResetForm } from "@/components/admin/demo-reset-form";
 import { settingsGroups } from "@/domain/merchant/settings";
+import { getDatabase } from "@/server/db/client";
 import { merchantCredentials } from "@/server/merchant-config";
 import { requireMerchant } from "@/server/merchant-session";
+import { SqliteBrandingRepository } from "@/server/repositories/branding-repository";
 
 export const metadata: Metadata = { title: "Settings" };
+
+const dateFormat = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
 
 const REPOSITORY = "https://github.com/harryfisher18/mero-moss-commerce/blob/main";
 
@@ -16,8 +25,8 @@ export default function SettingsPage() {
     <>
       <h1 className="font-serif text-3xl">Settings</h1>
       <p className="mt-1 max-w-3xl text-sm text-muted">
-        How this store is configured. Settings come from the server&rsquo;s environment, so they are
-        changed there, not here, and their values are never shown.
+        How this store is configured. The storefront wording is edited here. Everything else comes
+        from the server&rsquo;s environment, so it is changed there, and its values are never shown.
       </p>
       <Suspense fallback={<p className="mt-8 text-muted">Loading settings…</p>}>
         <Settings />
@@ -31,6 +40,9 @@ async function Settings() {
   await connection();
   const { isDemo } = merchantCredentials();
   const groups = settingsGroups(process.env);
+  const brandingRepository = new SqliteBrandingRepository(getDatabase());
+  const branding = brandingRepository.get();
+  const brandingHistory = brandingRepository.history();
 
   return (
     <div className="mt-6 space-y-8">
@@ -74,6 +86,42 @@ async function Settings() {
         ))}
       </div>
 
+      <section
+        aria-labelledby="branding-heading"
+        className="rounded-sm border border-line bg-white p-4 text-sm"
+      >
+        <h2 id="branding-heading" className="font-medium">
+          Storefront branding
+        </h2>
+        <p className="mt-1 text-muted">
+          The store name stays Mero &amp; Moss. Changes apply to the demo storefront only.
+        </p>
+        <BrandingForm current={branding} />
+        <h3 className="mt-6 font-medium">Change history</h3>
+        {brandingHistory.length === 0 ? (
+          <p className="mt-1 text-muted">
+            No changes yet. The storefront uses the original wording.
+          </p>
+        ) : (
+          <ol className="mt-2 space-y-2" data-testid="branding-history">
+            {brandingHistory.map((change, index) => (
+              <li key={`${change.createdAt}-${String(index)}`} className="break-words">
+                <span className="font-medium">
+                  {change.field === "tagline" ? "Tagline" : "Announcement"}
+                </span>
+                : {change.before || "(none)"} → {change.after || "(none)"}
+                <span className="block text-xs text-muted">
+                  {change.actor} ·{" "}
+                  <time dateTime={change.createdAt}>
+                    {dateFormat.format(new Date(change.createdAt))} UTC
+                  </time>
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
       <section aria-labelledby="upgrades-heading" className="text-sm">
         <h2 id="upgrades-heading" className="font-medium">
           Applying this to an existing store
@@ -113,8 +161,9 @@ async function Settings() {
         {isDemo ? (
           <>
             <p className="mt-1 text-muted">
-              Removes every order, cart, request, automation record and catalog edit, and restores
-              the original demo catalog. You stay signed in. This cannot be undone.
+              Removes every order, cart, request, automation record, catalog edit and branding
+              change, and restores the original demo catalog and wording. You stay signed in. This
+              cannot be undone.
             </p>
             <DemoResetForm />
           </>

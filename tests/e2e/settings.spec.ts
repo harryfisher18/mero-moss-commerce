@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { addToCart, checkout, query, signInAsMerchant, visible } from "./helpers";
+import { addToCart, checkout, DEMO_MERCHANT, query, signInAsMerchant, visible } from "./helpers";
 
 const count = (table: string) =>
   query((db) => Number(db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get()?.n));
@@ -23,6 +23,51 @@ test.describe("merchant settings", () => {
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
+  });
+
+  test("branding edits are previewed, validated, recorded and shown on the storefront", async ({
+    page,
+  }) => {
+    const tagline = "Kept for years, used every day.";
+    const announcement = "New table and kitchen pieces are in.";
+    try {
+      await signInAsMerchant(page, "/admin/settings");
+      const form = visible(page, "branding-form");
+      await form.getByLabel("Tagline").fill("");
+      await form.getByRole("button", { name: "Save branding" }).click();
+      await expect(form.getByTestId("branding-status")).toHaveText(
+        "Please fix the highlighted fields.",
+      );
+      await expect(form.getByLabel("Tagline")).toHaveAttribute("aria-invalid", "true");
+      await expect(form).toContainText("Tagline is required.");
+
+      await form.getByLabel("Tagline").fill(tagline);
+      await form.getByLabel("Announcement (optional)").fill(announcement);
+      const preview = form.getByTestId("branding-preview");
+      await expect(preview).toContainText(tagline);
+      await expect(preview).toContainText(announcement);
+      await form.getByRole("button", { name: "Save branding" }).click();
+      await expect(form.getByTestId("branding-status")).toHaveText(
+        "Saved. The storefront shows the new wording on its next page load.",
+      );
+      const history = visible(page, "branding-history");
+      await expect(history).toContainText(`Announcement: (none) → ${announcement}`);
+      await expect(history).toContainText(DEMO_MERCHANT.email);
+
+      await page.goto("/");
+      await expect(visible(page, "store-announcement")).toHaveText(announcement);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(tagline);
+      await expect(visible(page, "footer-tagline")).toHaveText(tagline);
+    } finally {
+      query((db) => {
+        db.prepare("DELETE FROM store_branding").run();
+      });
+    }
+    await page.goto("/");
+    await expect(page.locator("[data-testid=store-announcement]")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Well-made essentials for everyday living.",
+    );
   });
 
   test("a confirmed reset restores the seeded store and keeps the merchant signed in", async ({
