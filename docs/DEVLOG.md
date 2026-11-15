@@ -14,6 +14,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - Storefront: the home headline and footer tagline are read at request time, and an announcement line appears above the header only when set. The home headline's fallback reserves its space without showing stale wording.
   - `/admin/settings` has a Branding form with a live preview, field errors and a change history. The Server Action re-checks the session and validates with zod.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (37 files, 363 tests) · `npm run build` pass · `npm run test:e2e` pass (134 tests: 67 specs × desktop/mobile). The E2E covers a rejected empty tagline, the preview, the save and history, the storefront headline, announcement and footer, and the return to defaults. It also adds an axe scan of the home page with an announcement · `next dev` smoke check pass.
+- **PR:** [#62](https://github.com/harryfisher18/mero-moss-commerce/pull/62)
 - **Next:** #49 still needs a Shopify development store and token from the owner. The remaining audit candidate is a customer FAQ grounded in the stored policies.
 
 ## 2026-11-16: Issue #59, preview product edits before publishing
