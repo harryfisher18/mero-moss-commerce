@@ -1,11 +1,15 @@
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { Product } from "@/domain/commerce/catalog";
 import {
   type AuditChange,
+  canonicalEdit,
   diffProductEdit,
   type EditErrors,
+  type ProductEdit,
   parseProductEdit,
   type RawProductEdit,
+  storefrontEffects,
 } from "@/domain/commerce/product-edit";
 import { type Database, withTransaction } from "@/server/db/database";
 import { SqliteCatalogRepository } from "@/server/repositories/catalog-repository";
@@ -15,11 +19,34 @@ export interface CatalogAuditEvent extends AuditChange {
   readonly createdAt: string;
 }
 
-export type SaveProductResult =
-  | { readonly ok: true; readonly product: Product; readonly changes: readonly AuditChange[] }
+type EditFailure =
   | { readonly ok: false; readonly reason: "not_found" }
   | { readonly ok: false; readonly reason: "conflict" }
   | { readonly ok: false; readonly reason: "invalid"; readonly errors: EditErrors };
+
+export type PreviewProductResult =
+  | {
+      readonly ok: true;
+      readonly changes: readonly AuditChange[];
+      readonly effects: readonly string[];
+      /** Passed back on publish, which is refused unless the edit still matches. */
+      readonly fingerprint: string;
+    }
+  | EditFailure;
+
+export type SaveProductResult =
+  | { readonly ok: true; readonly product: Product; readonly changes: readonly AuditChange[] }
+  | { readonly ok: false; readonly reason: "preview_stale" }
+  | EditFailure;
+
+type Prepared =
+  | {
+      readonly ok: true;
+      readonly product: Product;
+      readonly edit: ProductEdit;
+      readonly fingerprint: string;
+    }
+  | EditFailure;
 
 const auditRow = z.object({
   entity_type: z.enum(["product", "variant"]),
@@ -33,7 +60,8 @@ const auditRow = z.object({
 });
 
 /**
- * Merchant catalog edits. Callers must have verified a merchant session. A save validates
+ * Merchant catalog edits, previewed and then published. Callers must have verified a
+ * merchant session. A preview writes nothing. A save validates
  * against the product as it is now, rejects stale forms (optimistic concurrency on
  * `updated_at`), writes product and variant changes, and records one audit row per
  * changed field, all in a single transaction. Storefront reads are request-time, so the
@@ -79,25 +107,40 @@ export class ProductEditService {
       });
   }
 
+  /** Validates an edit and describes what publishing it would change. Writes nothing. */
+  preview(productId: string, expectedUpdatedAt: string, raw: RawProductEdit): PreviewProductResult {
+    const prepared = this.prepare(productId, expectedUpdatedAt, raw);
+    if (!prepared.ok) return prepared;
+    return {
+      ok: true,
+      changes: diffProductEdit(prepared.product, prepared.edit),
+      effects: storefrontEffects(prepared.product, prepared.edit),
+      fingerprint: prepared.fingerprint,
+    };
+  }
+
+  /**
+   * Publishes an edit. `previewedFingerprint` must come from `preview` of the same edit
+   * against the same product version, so nothing is published that was not previewed.
+   */
   save(
     productId: string,
     expectedUpdatedAt: string,
     raw: RawProductEdit,
     actor: string,
+    previewedFingerprint: string,
   ): SaveProductResult {
     return withTransaction(this.db, (): SaveProductResult => {
-      const product = this.catalog.getProductById(productId);
-      if (!product) return { ok: false, reason: "not_found" };
-      if (product.updatedAt !== expectedUpdatedAt) return { ok: false, reason: "conflict" };
+      const prepared = this.prepare(productId, expectedUpdatedAt, raw);
+      if (!prepared.ok) return prepared;
+      if (prepared.fingerprint !== previewedFingerprint)
+        return { ok: false, reason: "preview_stale" };
+      const { product, edit } = prepared;
 
-      const parsed = parseProductEdit(raw, product);
-      if (!parsed.ok) return { ok: false, reason: "invalid", errors: parsed.errors };
-
-      const changes = diffProductEdit(product, parsed.edit);
+      const changes = diffProductEdit(product, edit);
       if (changes.length === 0) return { ok: true, product, changes };
 
       const now = this.now();
-      const { edit } = parsed;
       this.db
         .prepare(
           "UPDATE products SET title = ?, summary = ?, description = ?, status = ?, updated_at = ? WHERE id = ?",
@@ -138,5 +181,17 @@ export class ProductEditService {
       if (!updated) throw new Error("Product disappeared during save");
       return { ok: true, product: updated, changes };
     });
+  }
+
+  private prepare(productId: string, expectedUpdatedAt: string, raw: RawProductEdit): Prepared {
+    const product = this.catalog.getProductById(productId);
+    if (!product) return { ok: false, reason: "not_found" };
+    if (product.updatedAt !== expectedUpdatedAt) return { ok: false, reason: "conflict" };
+    const parsed = parseProductEdit(raw, product);
+    if (!parsed.ok) return { ok: false, reason: "invalid", errors: parsed.errors };
+    const fingerprint = createHash("sha256")
+      .update(canonicalEdit(productId, expectedUpdatedAt, parsed.edit))
+      .digest("hex");
+    return { ok: true, product, edit: parsed.edit, fingerprint };
   }
 }

@@ -4,6 +4,18 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-16: Issue #59, preview product edits before publishing
+
+- **Previous cycle:** #57 merged as `2574e16` (PR #58) through auto-merge.
+- **Selection:** the only open issue, #49, is blocked on a Shopify store from the owner. The product requirements ask the products manager to "preview and publish DEMO changes", but the editor saved straight to the live catalog. Opened [#59](https://github.com/harryfisher18/mero-moss-commerce/issues/59).
+- **Implemented:**
+  - `src/domain/commerce/product-edit.ts` (pure) gains `canonicalEdit` and `storefrontEffects`, which describe what shoppers will see differently using the storefront's own rules.
+  - `ProductEditService.preview` validates and diffs without writing. `save` now requires the previewed fingerprint (SHA-256 of the canonical edit and product version) and refuses a mismatch.
+  - The editor shows the changes and effects and a **Publish** button. Editing any field after a preview withdraws it.
+- **Bug found and fixed:** React resets a form after each action, and a `<select>` returns to the default it was first mounted with. So after a preview, or after a validation error before this change, the Status field quietly went back to its saved value. The select now remounts for every action result. The E2E checks it keeps the previewed value.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (35 files, 354 tests) · `npm run build` pass · `npm run test:e2e` pass (130 tests: 65 specs × desktop/mobile). Journey 2 now previews without writing, has a tampered publish refused by the server, withdraws a preview after an edit, and then publishes · `next dev` smoke check pass.
+- **Next:** #49 still needs a Shopify development store and token from the owner. Remaining audit candidates: store branding in merchant settings, and a customer FAQ grounded in the stored policies.
+
 ## 2026-11-12: Issue #57, merchant settings and demo reset
 
 - **Previous cycle:** #55 merged as `e3fedeb` (PR #56) through auto-merge.

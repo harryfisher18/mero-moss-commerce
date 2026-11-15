@@ -4,13 +4,13 @@ What has actually been run against Mero & Moss, and what those runs do not prove
 
 ## Latest full run
 
-Run on 2026-11-12 on Windows, on the branch for issue #57, based on `e3fedeb`.
+Run on 2026-11-16 on Windows, on the branch for issue #59, based on `2574e16`.
 
 | Command             | What it covers                                         | Result                                   |
 | ------------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `npm run lint`      | ESLint and Prettier                                    | Pass                                     |
 | `npm run typecheck` | Strict TypeScript                                      | Pass                                     |
-| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 347 tests in 35 files              |
+| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 354 tests in 35 files              |
 | `npm run build`     | Production build                                       | Pass                                     |
 | `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 130 tests (65 specs on 2 projects) |
 

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ORDER_STATUSES } from "@/domain/commerce/order";
-import type { RawProductEdit } from "@/domain/commerce/product-edit";
+import type { AuditChange, RawProductEdit } from "@/domain/commerce/product-edit";
 import { drillPayloadSchema } from "@/domain/events/outbox";
 import { formatDelay } from "@/domain/events/retry-policy";
 import { MAX_ADMIN_PATH_LENGTH, safeAdminPath } from "@/domain/merchant/navigation";
@@ -108,8 +108,16 @@ export interface ProductEditState {
   readonly status: "idle" | "success" | "error";
   readonly message: string;
   readonly errors: Readonly<Record<string, string>>;
-  /** Submitted values, echoed back on errors so nothing the merchant typed is lost. */
+  /** Submitted values, echoed back on errors and previews so nothing typed is lost. */
   readonly values: RawProductEdit | null;
+  /** Set after a successful preview: what publishing would change. */
+  readonly preview: ProductEditPreview | null;
+}
+
+export interface ProductEditPreview {
+  readonly changes: readonly AuditChange[];
+  readonly effects: readonly string[];
+  readonly fingerprint: string;
 }
 
 const MAX_VARIANTS = 50;
@@ -135,12 +143,21 @@ export async function saveProduct(
       summary: shortText,
       description: shortText,
       status: z.string().max(20),
+      intent: z.enum(["preview", "publish"]),
+      previewFingerprint: z.string().max(64),
     })
     .safeParse(
       Object.fromEntries(
-        ["productId", "expectedUpdatedAt", "title", "summary", "description", "status"].map(
-          (key) => [key, formData.get(key) ?? ""],
-        ),
+        [
+          "productId",
+          "expectedUpdatedAt",
+          "title",
+          "summary",
+          "description",
+          "status",
+          "intent",
+          "previewFingerprint",
+        ].map((key) => [key, formData.get(key) ?? ""]),
       ),
     );
   const shapeOk =
@@ -154,6 +171,7 @@ export async function saveProduct(
       message: "This form was incomplete. Reload the page and try again.",
       errors: {},
       values: null,
+      preview: null,
     };
   }
 
@@ -170,12 +188,17 @@ export async function saveProduct(
     })),
   };
 
-  const result = productEditor().save(
-    header.data.productId,
-    header.data.expectedUpdatedAt,
-    raw,
-    session.email,
-  );
+  const editor = productEditor();
+  const result =
+    header.data.intent === "preview"
+      ? editor.preview(header.data.productId, header.data.expectedUpdatedAt, raw)
+      : editor.save(
+          header.data.productId,
+          header.data.expectedUpdatedAt,
+          raw,
+          session.email,
+          header.data.previewFingerprint,
+        );
   if (!result.ok) {
     switch (result.reason) {
       case "invalid":
@@ -184,6 +207,15 @@ export async function saveProduct(
           message: "Please fix the highlighted fields.",
           errors: result.errors,
           values: raw,
+          preview: null,
+        };
+      case "preview_stale":
+        return {
+          status: "error",
+          message: "These edits changed after the preview. Preview them again before publishing.",
+          errors: {},
+          values: raw,
+          preview: null,
         };
       case "conflict":
         return {
@@ -192,6 +224,7 @@ export async function saveProduct(
             "This product was changed after you opened it. Reload to see the latest version, then reapply your edits.",
           errors: {},
           values: raw,
+          preview: null,
         };
       case "not_found":
         return {
@@ -199,18 +232,42 @@ export async function saveProduct(
           message: "This product no longer exists.",
           errors: {},
           values: null,
+          preview: null,
         };
     }
   }
   const count = result.changes.length;
+  const noun = count === 1 ? "change" : "changes";
+  if ("fingerprint" in result) {
+    return count === 0
+      ? {
+          status: "idle",
+          message: "No changes to publish.",
+          errors: {},
+          values: raw,
+          preview: null,
+        }
+      : {
+          status: "idle",
+          message: `Previewing ${String(count)} ${noun}. Nothing is published yet.`,
+          errors: {},
+          values: raw,
+          preview: {
+            changes: result.changes,
+            effects: result.effects,
+            fingerprint: result.fingerprint,
+          },
+        };
+  }
   return {
     status: "success",
     message:
       count === 0
-        ? "No changes to save."
-        : `Saved ${count} ${count === 1 ? "change" : "changes"}. The storefront now shows the update.`,
+        ? "No changes to publish."
+        : `Published ${String(count)} ${noun}. The storefront now shows the update.`,
     errors: {},
     values: null,
+    preview: null,
   };
 }
 

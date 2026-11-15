@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Product, ProductStatus } from "./catalog";
 import { type Money, parseMoneyInput, toDecimalString } from "./money";
+import { priceDisplay } from "./variant-selection";
 
 /**
  * Merchant product editing rules: validation of submitted form values and a field-level
@@ -199,4 +200,76 @@ export function diffProductEdit(product: Product, edit: ProductEdit): AuditChang
 /** Converts a stored Money back to the shape used by forms; exported for the editor UI. */
 export function formMoney(value: Money | null): string {
   return value ? toDecimalString(value) : "";
+}
+
+/**
+ * A canonical text form of a validated edit, bound to the product version it was made
+ * against. A publish must match the edit the merchant previewed, so the server hashes this
+ * at preview time and compares it again at publish time.
+ */
+export function canonicalEdit(
+  productId: string,
+  expectedUpdatedAt: string,
+  edit: ProductEdit,
+): string {
+  return JSON.stringify([
+    productId,
+    expectedUpdatedAt,
+    edit.title,
+    edit.summary,
+    edit.description,
+    edit.status,
+    edit.variants.map((v) => [
+      v.id,
+      v.price.amountMinor,
+      v.price.currency,
+      v.compareAtPrice?.amountMinor ?? null,
+      v.compareAtPrice?.currency ?? null,
+      v.inventoryQuantity,
+    ]),
+  ]);
+}
+
+/** Merchant-facing names for the fields in an `AuditChange`. */
+export const CHANGE_FIELD_LABELS: Readonly<Record<string, string>> = {
+  title: "Title",
+  summary: "Summary",
+  description: "Description",
+  status: "Status",
+  price: "Price",
+  compareAtPrice: "Compare-at price",
+  inventoryQuantity: "Stock",
+};
+
+/**
+ * What shoppers will see differently once the edit is published, using the same rules as
+ * the storefront: a product is listed only while active, a variant is sold out at zero
+ * stock, and it shows as reduced when its compare-at price is above its price.
+ */
+export function storefrontEffects(product: Product, edit: ProductEdit): string[] {
+  const effects: string[] = [];
+  const wasListed = product.status === "active";
+  const willBeListed = edit.status === "active";
+  if (wasListed && !willBeListed) effects.push("The product will be hidden from the store.");
+  if (!wasListed && willBeListed) effects.push("The product will be listed in the store.");
+
+  for (const current of product.variants) {
+    const next = edit.variants.find((v) => v.id === current.id);
+    if (!next) continue;
+    if (current.inventoryQuantity > 0 && next.inventoryQuantity <= 0) {
+      effects.push(`${current.sku} will show as sold out.`);
+    }
+    if (current.inventoryQuantity <= 0 && next.inventoryQuantity > 0) {
+      effects.push(`${current.sku} will be back in stock.`);
+    }
+    const before = priceDisplay(current);
+    const after = priceDisplay({ price: next.price, compareAtPrice: next.compareAtPrice });
+    if (after.compareAt && after.compareAt !== before.compareAt) {
+      effects.push(`${current.sku} will show as reduced from ${after.compareAt}.`);
+    }
+    if (before.compareAt && !after.compareAt) {
+      effects.push(`${current.sku} will no longer show as reduced.`);
+    }
+  }
+  return effects;
 }
