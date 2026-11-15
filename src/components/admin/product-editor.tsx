@@ -1,12 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
-import { type ProductEditState, saveProduct } from "@/app/admin/actions";
+import { useActionState, useEffect, useState } from "react";
+import { type ProductEditPreview, type ProductEditState, saveProduct } from "@/app/admin/actions";
 import type { Product } from "@/domain/commerce/catalog";
-import { formMoney, PRODUCT_STATUSES, type RawProductEdit } from "@/domain/commerce/product-edit";
+import {
+  CHANGE_FIELD_LABELS,
+  formMoney,
+  PRODUCT_STATUSES,
+  type RawProductEdit,
+} from "@/domain/commerce/product-edit";
 
-const initialState: ProductEditState = { status: "idle", message: "", errors: {}, values: null };
+const initialState: ProductEditState = {
+  status: "idle",
+  message: "",
+  errors: {},
+  values: null,
+  preview: null,
+};
 
 const STATUS_LABELS: Record<(typeof PRODUCT_STATUSES)[number], string> = {
   active: "Active (visible in the store)",
@@ -38,6 +49,18 @@ export function ProductEditor({ product }: { product: Product }) {
   useEffect(() => {
     if (state.status === "success") router.refresh();
   }, [state, router]);
+  // Editing any field after a preview withdraws it: only a previewed edit can be published.
+  const [editedAfter, setEditedAfter] = useState<ProductEditState | null>(null);
+  const preview = state.preview && editedAfter !== state ? state.preview : null;
+  const previewWithdrawn = state.preview !== null && editedAfter === state;
+  // React resets the form after each action. A <select> resets to the default it was first
+  // mounted with, not the echoed value, so it is remounted for every new result.
+  const [lastState, setLastState] = useState(state);
+  const [resultCount, setResultCount] = useState(0);
+  if (lastState !== state) {
+    setLastState(state);
+    setResultCount((count) => count + 1);
+  }
 
   const values = state.values ?? fromProduct(product);
   const error = (key: string) => state.errors[key];
@@ -70,6 +93,9 @@ export function ProductEditor({ product }: { product: Product }) {
       <form
         key={product.updatedAt}
         action={formAction}
+        onChange={() => {
+          if (state.preview) setEditedAfter(state);
+        }}
         className="space-y-8"
         data-testid="product-editor"
       >
@@ -123,6 +149,7 @@ export function ProductEditor({ product }: { product: Product }) {
               Status
             </label>
             <select
+              key={resultCount}
               id="status"
               name="status"
               defaultValue={values.status}
@@ -210,17 +237,86 @@ export function ProductEditor({ product }: { product: Product }) {
         <div className="flex flex-wrap items-center gap-4">
           <button
             type="submit"
+            name="intent"
+            value="preview"
             disabled={pending}
-            className="rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper hover:bg-moss disabled:opacity-60"
+            className={`rounded-full px-6 py-3 text-sm font-medium disabled:opacity-60 ${
+              preview
+                ? "border border-ink text-ink hover:bg-ink/5"
+                : "bg-ink text-paper hover:bg-moss"
+            }`}
           >
-            {pending ? "Saving…" : "Save changes"}
+            {preview ? "Preview again" : "Preview changes"}
           </button>
           <p className="text-xs text-muted">
-            Demo catalog only. Changes apply to the storefront immediately and are recorded in the
-            change history.
+            Demo catalog only. Nothing reaches the storefront until you publish, and every published
+            change is recorded in the change history.
           </p>
         </div>
+        {previewWithdrawn && (
+          <p className="text-sm text-clay" data-testid="preview-withdrawn">
+            You edited the form after previewing. Preview again to publish.
+          </p>
+        )}
+        {preview && <PreviewPanel preview={preview} pending={pending} />}
       </form>
     </div>
+  );
+}
+
+function PreviewPanel({ preview, pending }: { preview: ProductEditPreview; pending: boolean }) {
+  const count = preview.changes.length;
+  return (
+    <section
+      aria-labelledby="preview-heading"
+      className="rounded-sm border border-moss bg-white p-5"
+      data-testid="edit-preview"
+    >
+      <input type="hidden" name="previewFingerprint" value={preview.fingerprint} />
+      <h2 id="preview-heading" className="font-medium">
+        Review before publishing
+      </h2>
+      <ul className="mt-3 divide-y divide-line text-sm">
+        {preview.changes.map((change) => (
+          <li
+            key={`${change.entityId}.${change.field}`}
+            className="py-2"
+            data-testid="preview-change"
+          >
+            <p className="text-xs text-muted">
+              {change.entityType === "product" ? "Product" : change.label} ·{" "}
+              {CHANGE_FIELD_LABELS[change.field] ?? change.field}
+            </p>
+            <p className="mt-1 break-words whitespace-pre-wrap">
+              <span className="text-muted line-through">{change.before || "(none)"}</span>
+              <span aria-hidden="true"> → </span>
+              <span className="sr-only"> changes to </span>
+              <span>{change.after || "(none)"}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+      <h3 className="mt-4 text-sm font-medium">What shoppers will see</h3>
+      {preview.effects.length > 0 ? (
+        <ul className="mt-1 list-disc pl-5 text-sm" data-testid="preview-effects">
+          {preview.effects.map((effect) => (
+            <li key={effect}>{effect}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-1 text-sm text-muted" data-testid="preview-effects">
+          The new values, with no change to whether the product or its options are available.
+        </p>
+      )}
+      <button
+        type="submit"
+        name="intent"
+        value="publish"
+        disabled={pending}
+        className="mt-5 rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper hover:bg-moss disabled:opacity-60"
+      >
+        {pending ? "Publishing…" : `Publish ${String(count)} ${count === 1 ? "change" : "changes"}`}
+      </button>
+    </section>
   );
 }

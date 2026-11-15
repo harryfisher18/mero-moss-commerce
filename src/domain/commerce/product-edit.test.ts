@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Product, Variant } from "./catalog";
 import { money } from "./money";
-import { diffProductEdit, parseProductEdit, type RawProductEdit } from "./product-edit";
+import {
+  canonicalEdit,
+  diffProductEdit,
+  parseProductEdit,
+  type RawProductEdit,
+  storefrontEffects,
+} from "./product-edit";
 
 function variant(id: string, priceMinor: number, stock: number): Variant {
   return {
@@ -186,5 +192,79 @@ describe("diffProductEdit", () => {
         after: "2",
       },
     ]);
+  });
+});
+
+function parsed(overrides: Partial<RawProductEdit>, base: Product = product) {
+  const result = parseProductEdit(raw(overrides), base);
+  if (!result.ok) throw new Error("expected valid edit");
+  return result.edit;
+}
+
+describe("storefrontEffects", () => {
+  it("describes listing, sold-out and reduced-price changes as the storefront shows them", () => {
+    const edit = parsed({
+      status: "archived",
+      variants: [
+        { id: "m", price: "44.00", compareAt: "48.00", stock: "0" },
+        { id: "l", price: "58.00", compareAt: "", stock: "9" },
+      ],
+    });
+    expect(storefrontEffects(product, edit)).toEqual([
+      "The product will be hidden from the store.",
+      "SKU-m will show as sold out.",
+      "SKU-m will show as reduced from $48.00.",
+    ]);
+  });
+
+  it("reports products and variants coming back", () => {
+    const sold: Product = {
+      ...product,
+      status: "draft",
+      variants: [
+        { ...variant("m", 4400, 0), compareAtPrice: money(4800, "USD") },
+        variant("l", 5800, 9),
+      ],
+    };
+    const edit = parsed(
+      {
+        variants: [
+          { id: "m", price: "48.00", compareAt: "", stock: "3" },
+          { id: "l", price: "58.00", compareAt: "", stock: "9" },
+        ],
+      },
+      sold,
+    );
+    expect(storefrontEffects(sold, edit)).toEqual([
+      "The product will be listed in the store.",
+      "SKU-m will be back in stock.",
+      "SKU-m will no longer show as reduced.",
+    ]);
+  });
+
+  it("is empty when nothing shoppers see changes", () => {
+    expect(storefrontEffects(product, parsed({ title: "Felt Desk Mat, Merino" }))).toEqual([]);
+  });
+});
+
+describe("canonicalEdit", () => {
+  it("is the same for equivalent edits and differs for any changed value or product version", () => {
+    const base = canonicalEdit(product.id, product.updatedAt, parsed({}));
+    expect(canonicalEdit(product.id, product.updatedAt, parsed({ title: " Felt Desk Mat " }))).toBe(
+      base,
+    );
+    expect(canonicalEdit(product.id, "2026-02-01T00:00:00.000Z", parsed({}))).not.toBe(base);
+    expect(
+      canonicalEdit(
+        product.id,
+        product.updatedAt,
+        parsed({
+          variants: [
+            { id: "m", price: "48.00", compareAt: "", stock: "13" },
+            { id: "l", price: "58.00", compareAt: "", stock: "9" },
+          ],
+        }),
+      ),
+    ).not.toBe(base);
   });
 });

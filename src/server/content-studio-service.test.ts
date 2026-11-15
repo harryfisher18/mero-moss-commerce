@@ -156,23 +156,21 @@ describe("ContentStudioService", () => {
     const editor = new ProductEditService(db, () => "2026-11-08T13:00:00.000Z");
     const product = studio.product(LAMP);
     if (!product) throw new Error("missing product");
-    const saved = editor.save(
-      LAMP,
-      product.updatedAt,
-      {
-        title: product.title,
-        summary: product.summary,
-        description: product.description,
-        status: product.status,
-        variants: product.variants.map((v) => ({
-          id: v.id,
-          price: "150",
-          compareAt: "",
-          stock: String(v.inventoryQuantity),
-        })),
-      },
-      ACTOR,
-    );
+    const edit = {
+      title: product.title,
+      summary: product.summary,
+      description: product.description,
+      status: product.status,
+      variants: product.variants.map((v) => ({
+        id: v.id,
+        price: "150",
+        compareAt: "",
+        stock: String(v.inventoryQuantity),
+      })),
+    };
+    const preview = editor.preview(LAMP, product.updatedAt, edit);
+    if (!preview.ok) throw new Error("preview failed");
+    const saved = editor.save(LAMP, product.updatedAt, edit, ACTOR, preview.fingerprint);
     expect(saved.ok).toBe(true);
     expect(studio.approve(generated.draft.id, ACTOR)).toEqual({ ok: false, reason: "stale" });
   });

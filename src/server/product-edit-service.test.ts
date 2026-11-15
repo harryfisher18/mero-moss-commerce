@@ -50,20 +50,110 @@ function formFor(
   };
 }
 
+/** Previews an edit and publishes exactly what was previewed, as the editor does. */
+function publish(productId: string, updatedAt: string, raw: RawProductEdit, actor: string) {
+  const preview = editor.preview(productId, updatedAt, raw);
+  if (!preview.ok) return preview;
+  return editor.save(productId, updatedAt, raw, actor, preview.fingerprint);
+}
+
 function current(): Product {
   const product = editor.get(MAT);
   if (!product) throw new Error("seed product missing");
   return product;
 }
 
+describe("ProductEditService.preview", () => {
+  it("lists the changes and their storefront effects without writing anything", () => {
+    const product = current();
+    const preview = editor.preview(
+      MAT,
+      product.updatedAt,
+      formFor(
+        product,
+        { status: "draft" },
+        { [MAT_LARGE]: { price: "52.00", compareAt: "58.00", stock: "0" } },
+      ),
+    );
+    if (!preview.ok) throw new Error("preview failed");
+    expect(preview.changes.map((c) => [c.label, c.field, c.before, c.after])).toEqual([
+      ["felt-desk-mat", "status", "active", "draft"],
+      ["MM-WS-FDM-CHR-L", "price", "58.00", "52.00"],
+      ["MM-WS-FDM-CHR-L", "compareAtPrice", "", "58.00"],
+      ["MM-WS-FDM-CHR-L", "inventoryQuantity", "9", "0"],
+    ]);
+    expect(preview.effects).toEqual([
+      "The product will be hidden from the store.",
+      "MM-WS-FDM-CHR-L will show as sold out.",
+      "MM-WS-FDM-CHR-L will show as reduced from $58.00.",
+    ]);
+    expect(preview.fingerprint).toMatch(/^[0-9a-f]{64}$/);
+    expect(current()).toEqual(product);
+    expect(editor.audit(MAT)).toEqual([]);
+  });
+
+  it("reports invalid, stale and missing products like a save would", () => {
+    const product = current();
+    expect(
+      editor.preview(MAT, product.updatedAt, formFor(product, {}, { [MAT_LARGE]: { stock: "x" } })),
+    ).toMatchObject({ ok: false, reason: "invalid" });
+    expect(editor.preview(MAT, "2000-01-01T00:00:00.000Z", formFor(product))).toEqual({
+      ok: false,
+      reason: "conflict",
+    });
+    expect(editor.preview("prod_missing", "x", formFor(product))).toEqual({
+      ok: false,
+      reason: "not_found",
+    });
+  });
+});
+
 describe("ProductEditService.save", () => {
+  it("refuses to publish an edit that differs from the one previewed", () => {
+    const product = current();
+    const preview = editor.preview(
+      MAT,
+      product.updatedAt,
+      formFor(product, { title: "Previewed" }),
+    );
+    if (!preview.ok) throw new Error("preview failed");
+    expect(
+      editor.save(
+        MAT,
+        product.updatedAt,
+        formFor(product, { title: "Changed after" }),
+        "owner",
+        preview.fingerprint,
+      ),
+    ).toEqual({ ok: false, reason: "preview_stale" });
+    expect(
+      editor.save(MAT, product.updatedAt, formFor(product, { title: "Previewed" }), "owner", ""),
+    ).toEqual({
+      ok: false,
+      reason: "preview_stale",
+    });
+    expect(current()).toEqual(product);
+    expect(editor.audit(MAT)).toEqual([]);
+
+    // Whitespace the validator trims away does not count as a different edit.
+    const saved = editor.save(
+      MAT,
+      product.updatedAt,
+      formFor(product, { title: "  Previewed " }),
+      "owner",
+      preview.fingerprint,
+    );
+    expect(saved).toMatchObject({ ok: true });
+    expect(current().title).toBe("Previewed");
+  });
+
   it("updates price, compare-at and stock, and the storefront and cart see it immediately", () => {
     const cart = new CartService(db);
     const { cartId } = cart.add(undefined, MAT_LARGE, 2);
     expect(cart.getCart(cartId).totals.subtotal.amountMinor).toBe(11600);
 
     const product = current();
-    const result = editor.save(
+    const result = publish(
       MAT,
       product.updatedAt,
       formFor(product, {}, { [MAT_LARGE]: { price: "52.00", compareAt: "58.00", stock: "1" } }),
@@ -100,9 +190,9 @@ describe("ProductEditService.save", () => {
 
   it("hides a product from the storefront when set to draft", () => {
     const product = current();
-    expect(
-      editor.save(MAT, product.updatedAt, formFor(product, { status: "draft" }), "owner").ok,
-    ).toBe(true);
+    expect(publish(MAT, product.updatedAt, formFor(product, { status: "draft" }), "owner").ok).toBe(
+      true,
+    );
     const repo = new SqliteCatalogRepository(db);
     expect(repo.getProductByHandle("felt-desk-mat")).toBeNull();
     expect(repo.isActiveProductHandle("felt-desk-mat")).toBe(false);
@@ -111,7 +201,7 @@ describe("ProductEditService.save", () => {
 
   it("records one audit row per changed field, newest first", () => {
     const product = current();
-    editor.save(
+    publish(
       MAT,
       product.updatedAt,
       formFor(product, { title: "Felt Desk Mat (Merino)" }, { [MAT_LARGE]: { stock: "4" } }),
@@ -137,12 +227,10 @@ describe("ProductEditService.save", () => {
 
   it("rejects stale forms instead of overwriting newer changes", () => {
     const original = current();
-    expect(
-      editor.save(MAT, original.updatedAt, formFor(original, { title: "First" }), "a").ok,
-    ).toBe(true);
-    expect(
-      editor.save(MAT, original.updatedAt, formFor(original, { title: "Second" }), "b"),
-    ).toEqual({
+    expect(publish(MAT, original.updatedAt, formFor(original, { title: "First" }), "a").ok).toBe(
+      true,
+    );
+    expect(publish(MAT, original.updatedAt, formFor(original, { title: "Second" }), "b")).toEqual({
       ok: false,
       reason: "conflict",
     });
@@ -151,7 +239,7 @@ describe("ProductEditService.save", () => {
 
   it("does not write or audit anything for invalid or unchanged forms", () => {
     const product = current();
-    const invalid = editor.save(
+    const invalid = publish(
       MAT,
       product.updatedAt,
       formFor(product, {}, { [MAT_LARGE]: { price: "-1" } }),
@@ -159,11 +247,11 @@ describe("ProductEditService.save", () => {
     );
     expect(invalid).toMatchObject({ ok: false, reason: "invalid" });
 
-    const unchanged = editor.save(MAT, product.updatedAt, formFor(product), "owner");
+    const unchanged = publish(MAT, product.updatedAt, formFor(product), "owner");
     expect(unchanged).toMatchObject({ ok: true, changes: [] });
     expect(current().updatedAt).toBe(product.updatedAt);
     expect(editor.audit(MAT)).toEqual([]);
-    expect(editor.save("prod_missing", "x", formFor(product), "owner")).toEqual({
+    expect(publish("prod_missing", "x", formFor(product), "owner")).toEqual({
       ok: false,
       reason: "not_found",
     });

@@ -18,6 +18,11 @@ function restoreLamp() {
   });
 }
 
+const brassPrice = () =>
+  query((db) =>
+    Number(db.prepare("SELECT price_minor AS p FROM variants WHERE id = ?").get(BRASS)?.p),
+  );
+
 const auditCount = () =>
   query((db) =>
     Number(
@@ -29,6 +34,7 @@ const auditCount = () =>
 /**
  * Journey 2 from the product requirements: a merchant edits price and stock in the console
  * and the storefront and cart reflect the new values; drafts disappear from the store.
+ * Edits are previewed first, and only the previewed edit can be published.
  */
 test("Journey 2: merchant edits propagate to the storefront and cart", async ({ page }) => {
   restoreLamp();
@@ -49,7 +55,7 @@ test("Journey 2: merchant edits propagate to the storefront and cart", async ({ 
     // Invalid input is rejected, kept in the form, and nothing is saved.
     const auditBefore = auditCount();
     await brass.getByLabel(/^Price/).fill("abc");
-    await editor.getByRole("button", { name: "Save changes" }).click();
+    await editor.getByRole("button", { name: "Preview changes" }).click();
     await expect(visible(page, "editor-status")).toHaveText("Please fix the highlighted fields.");
     await expect(brass.getByLabel(/^Price/)).toHaveValue("abc");
     await expect(brass.getByLabel(/^Price/)).toHaveAttribute("aria-invalid", "true");
@@ -59,9 +65,47 @@ test("Journey 2: merchant edits propagate to the storefront and cart", async ({ 
     await brass.getByLabel(/^Price/).fill("128");
     await brass.getByLabel(/^Compare-at/).fill("148.00");
     await black.getByLabel(/^Stock/).fill("0");
-    await editor.getByRole("button", { name: "Save changes" }).click();
+    await editor.getByRole("button", { name: "Preview changes" }).click();
     await expect(visible(page, "editor-status")).toHaveText(
-      "Saved 3 changes. The storefront now shows the update.",
+      "Previewing 3 changes. Nothing is published yet.",
+    );
+    const preview = editor.getByTestId("edit-preview");
+    await expect(preview.getByTestId("preview-change")).toHaveCount(3);
+    await expect(preview).toContainText("MM-WS-BTL-BRS · Price");
+    await expect(preview.getByTestId("preview-effects")).toContainText(
+      "MM-WS-BTL-BRS will show as reduced from $148.00.",
+    );
+    await expect(preview.getByTestId("preview-effects")).toContainText(
+      "MM-WS-BTL-BLK will show as sold out.",
+    );
+    // Previewing publishes nothing.
+    expect(auditCount()).toBe(auditBefore);
+    expect(brassPrice()).toBe(14800);
+
+    // A publish that does not match the preview is refused by the server. The value is
+    // changed without an input event, so the page still offers the publish button.
+    await black.getByLabel(/^Stock/).evaluate((input: HTMLInputElement) => {
+      input.value = "5";
+    });
+    await preview.getByRole("button", { name: "Publish 3 changes" }).click();
+    await expect(visible(page, "editor-status")).toHaveText(
+      "These edits changed after the preview. Preview them again before publishing.",
+    );
+    await expect(black.getByLabel(/^Stock/)).toHaveValue("5");
+    expect(auditCount()).toBe(auditBefore);
+
+    // Editing after a preview withdraws it until the edit is previewed again.
+    await black.getByLabel(/^Stock/).fill("0");
+    await editor.getByRole("button", { name: "Preview changes" }).click();
+    await expect(preview.getByRole("button", { name: "Publish 3 changes" })).toBeVisible();
+    await brass.getByLabel(/^Stock/).fill("6");
+    await expect(editor.getByTestId("edit-preview")).toHaveCount(0);
+    await expect(editor.getByTestId("preview-withdrawn")).toBeVisible();
+    await brass.getByLabel(/^Stock/).fill("7");
+    await editor.getByRole("button", { name: "Preview changes" }).click();
+    await preview.getByRole("button", { name: "Publish 3 changes" }).click();
+    await expect(visible(page, "editor-status")).toHaveText(
+      "Published 3 changes. The storefront now shows the update.",
     );
     // Earlier runs (e.g. the other browser project) leave their own audit rows behind.
     expect(auditCount()).toBe(auditBefore + 3);
@@ -100,9 +144,16 @@ test("Journey 2: merchant edits propagate to the storefront and cart", async ({ 
     await page.goto(`/admin/products/${LAMP}`);
     const editorAgain = visible(page, "product-editor");
     await editorAgain.getByLabel("Status").selectOption("draft");
-    await editorAgain.getByRole("button", { name: "Save changes" }).click();
+    await editorAgain.getByRole("button", { name: "Preview changes" }).click();
+    const draftPreview = editorAgain.getByTestId("edit-preview");
+    // The form keeps the previewed choice, so the publish matches the preview.
+    await expect(editorAgain.getByLabel("Status")).toHaveValue("draft");
+    await expect(draftPreview.getByTestId("preview-effects")).toHaveText(
+      "The product will be hidden from the store.",
+    );
+    await draftPreview.getByRole("button", { name: "Publish 1 change" }).click();
     await expect(visible(page, "editor-status")).toHaveText(
-      "Saved 1 change. The storefront now shows the update.",
+      "Published 1 change. The storefront now shows the update.",
     );
     expect((await page.goto("/products/brass-task-lamp"))?.status()).toBe(404);
     await page.goto("/collections/workspace");
