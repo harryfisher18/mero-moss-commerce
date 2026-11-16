@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { FooterTagline } from "./store-branding";
 
@@ -12,8 +13,12 @@ export function StoreFooter() {
           </Suspense>
         </p>
         <p className="max-w-md sm:text-right">
-          A demo store. All products and orders are simulated. We record anonymous shopping steps,
-          never your name, email or address, and honor Global Privacy Control.
+          <Link href="/help" className="text-ink underline underline-offset-2">
+            Help &amp; FAQ
+          </Link>
+          <span aria-hidden="true"> · </span>A demo store. All products and orders are simulated. We
+          record anonymous shopping steps, never your name, email or address, and honor Global
+          Privacy Control.
         </p>
       </div>
     </footer>

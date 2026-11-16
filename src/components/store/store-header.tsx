@@ -11,6 +11,7 @@ const NAV = [
   })),
   { href: "/#policies", label: "Shipping & returns" },
   { href: "/advisor", label: "Ask an advisor" },
+  { href: "/help", label: "Help" },
 ];
 
 export function StoreHeader() {
