@@ -36,6 +36,10 @@ async function scan(page: Page, routes: readonly string[]): Promise<Finding[]> {
 const firstId = (sql: string) => query((db) => String(db.prepare(sql).get()?.id ?? ""));
 
 test.describe("accessibility (axe, WCAG A and AA)", () => {
+  // Each test visits many routes, waits for them to finish streaming, then runs axe on
+  // every one, so the default 30 s budget for a single test is too tight.
+  test.describe.configure({ timeout: 90_000 });
+
   test("storefront routes have no violations", async ({ page }) => {
     await addToCart(page, "/products/felt-desk-mat?variant=var_mm-ws-fdm-oat-m", 1);
     expect(
@@ -49,6 +53,7 @@ test.describe("accessibility (axe, WCAG A and AA)", () => {
         "/checkout",
         "/advisor",
         "/search?q=linen",
+        "/help",
         "/search?q=velvet%20armchair",
         "/advisor?q=travel%20gifts%20under%20%2450",
         "/advisor?q=What%20is%20your%20return%20policy%3F",

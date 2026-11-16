@@ -4,15 +4,15 @@ What has actually been run against Mero & Moss, and what those runs do not prove
 
 ## Latest full run
 
-Run on 2026-11-16 on Windows, on the branch for issue #61, based on `a045ace`.
+Run on 2026-11-17 on Windows, on the branch for issue #63, based on `9cafcd6`.
 
 | Command             | What it covers                                         | Result                                   |
 | ------------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `npm run lint`      | ESLint and Prettier                                    | Pass                                     |
 | `npm run typecheck` | Strict TypeScript                                      | Pass                                     |
-| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 363 tests in 37 files              |
+| `npm test`          | Domain rules and integration tests against real SQLite | Pass, 367 tests in 38 files              |
 | `npm run build`     | Production build                                       | Pass                                     |
-| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 134 tests (67 specs on 2 projects) |
+| `npm run test:e2e`  | Playwright, Chromium on desktop and mobile emulation   | Pass, 138 tests (69 specs on 2 projects) |
 
 The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR.md](DEMO_TOUR.md), and the accessibility scans below.
 
@@ -22,7 +22,7 @@ The browser tests cover the four mandatory journeys, the demo tour in [DEMO_TOUR
 
 | Area             | Routes scanned                                                                                                                                                                             | Violations |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| Storefront       | Home (also with a merchant announcement), collections (with filters), product, cart, checkout, advisor (empty, products, policy), search (results, no matches), 404                        | 0          |
+| Storefront       | Home (also with a merchant announcement), collections (with filters), product, cart, checkout, advisor (empty, products, policy), search (results, no matches), help, 404                  | 0          |
 | Merchant console | Login, overview, orders, order detail, products, product editor, Content Studio, automations, event detail, requests, lifecycle, integrations, analytics, Upgrade Lab (all tabs), settings | 0          |
 
 These scans changed the product. Fixed as a result:

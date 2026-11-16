@@ -40,6 +40,8 @@ Open [/advisor](http://localhost:3000/advisor) (also linked from the header, pro
 - **Optional assisted wording.** With a key set, the advisor asks Claude (`claude-opus-5-5` by default, overridable with `ADVISOR_MODEL`) to reword the same validated facts. The reply is rejected, and the catalog wording shown instead, if it introduces any price not in the facts, a percentage, a code, a link, contact details or an unsupported "free" claim, or if the call fails, times out or is refused. The integration state (`DEMO`, `CONFIGURED`, `CONNECTED_VERIFIED`, `ERROR`) comes from real calls only and is shown to merchants.
 - **Human escalation.** "Talk to a person" saves the shopper's email, message and advisor question for the shop team. No email is sent.
 
+[/help](http://localhost:3000/help) (linked from the header and footer) answers common questions. Shipping, returns, warranty and payment answers are the stored policy text, word for word. The answers on choosing, reaching a person and privacy describe only what the store actually does.
+
 ## Merchant console
 
 Open [/admin](http://localhost:3000/admin) to:

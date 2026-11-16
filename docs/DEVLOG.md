@@ -4,6 +4,18 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-17: Issue #63, storefront Help & FAQ
+
+- **Previous cycle:** #61 merged as `9cafcd6` (PR #62) through auto-merge.
+- **Issue:** [#63](https://github.com/harryfisher18/mero-moss-commerce/issues/63), the "trust/FAQ" part of the storefront home requirements.
+- **Implemented:**
+  - `src/domain/commerce/faq.ts` (pure): payment, shipping, returns and warranty questions are answered with the stored policy body, word for word, and are left out if that policy is missing. The answers on choosing, reaching a person and privacy describe only implemented behaviour: the catalog-grounded advisor, "Talk to a person" saving a request with no email sent, and anonymous session analytics that honour Global Privacy Control.
+  - `/help` shows the answers as native `<details>` disclosures, each linking to where it can be acted on (the privacy answer has no link). It is linked from the header and footer.
+- **Test change:** the accessibility scan tests visit up to 15 routes each. The storefront scan hit the 30 s per-test limit on desktop once `/help` was added, so the scan describe block now has a 90 s budget, as the demo-tour spec does. No assertion changed.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (38 files, 367 tests) · `npm run build` pass · `npm run test:e2e` pass (138 tests: 69 specs × desktop/mobile), including stored-policy text checks, keyboard opening, every FAQ link, and an axe scan of `/help` · `next dev` smoke check pass.
+- **PR:** [#64](https://github.com/harryfisher18/mero-moss-commerce/pull/64)
+- **Next:** #49 still needs a Shopify development store and token from the owner. The storefront and console requirements in the product skill are otherwise met. A fresh audit of the hard acceptance gates is the next step.
+
 ## 2026-11-16: Issue #61, storefront branding in merchant settings
 
 - **Previous cycle:** #59 merged as `a045ace` (PR #60) through auto-merge.
