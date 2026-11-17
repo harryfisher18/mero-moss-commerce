@@ -7,7 +7,8 @@ How this codebase could become six kinds of client project. Each section separat
 **Exists here**
 
 - A catalog model with variants, stock states, pricing in integer minor units, and filtering.
-- A mobile-first storefront, cart and checkout flow that pass automated accessibility checks.
+- A mobile-first storefront with search, an FAQ quoting stored policies, a cart and a checkout flow, all passing automated accessibility checks.
+- Merchant-editable storefront wording (tagline and announcement), with a change history.
 - A read-only `ShopifyStoreAdapter` that has been tested only against a stand-in.
 
 **To build**
@@ -35,7 +36,7 @@ How this codebase could become six kinds of client project. Each section separat
 **Exists here**
 
 - The `StorePlatformAdapter` boundary and a webhook signature check using a timing-safe comparison.
-- An audited merchant console, with validated Server Actions.
+- An audited merchant console, with validated Server Actions: an overview counted from real data, product edits previewed before publishing, settings and a guarded demo reset.
 
 **To build**
 
@@ -63,6 +64,7 @@ How this codebase could become six kinds of client project. Each section separat
 
 - A transactional outbox, so an order and its event always commit together.
 - A worker with routing, review tags, bounded retries, a dead letter queue and safe replay.
+- A review queue that holds flagged orders until a person clears them, and a fulfillment preview that sends nothing.
 - A job inspector with personal data masked.
 
 **To build**

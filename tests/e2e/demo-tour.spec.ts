@@ -143,6 +143,7 @@ test("the demo tour works exactly as written", async ({ page }) => {
       ["Lifecycle", /\/admin\/lifecycle$/],
       ["Requests", /\/admin\/support$/],
       ["Integrations", /\/admin\/integrations$/],
+      ["Settings", /\/admin\/settings$/],
     ] as const) {
       await consoleMenu().getByRole("link", { name }).click();
       await expect(page).toHaveURL(url);
