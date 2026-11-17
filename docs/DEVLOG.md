@@ -19,6 +19,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - `SERVICE_ADAPTATIONS.md`: search, FAQ, branding, overview, previewed edits, the review queue and the fulfillment preview.
 - **Test fix:** the first full E2E run failed once on mobile in `help.spec.ts` (from #63). Enter on a focused FAQ question did not open it, most likely because the key press arrived before the streamed page had settled. The test now waits for the network to go idle, as the axe scans do, and checks that the answer is open before reading it.
 - **Checks:** see the PR. The audit changed no product code.
+- **PR:** [#69](https://github.com/harryfisher18/mero-moss-commerce/pull/69)
 - **Next:** #66, then #67 and #68. #49 still needs a Shopify development store and token from the owner.
 
 ## 2026-11-17: Issue #63, storefront Help & FAQ
