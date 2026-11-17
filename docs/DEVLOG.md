@@ -4,6 +4,24 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-17: Issue #65, acceptance-gate audit
+
+- **Previous cycle:** #63 merged as `f107310` (PR #64) through auto-merge.
+- **Issue:** [#65](https://github.com/harryfisher18/mero-moss-commerce/issues/65), checking each hard acceptance gate against the product before adding more features.
+- **Result:** `TEST_RESULTS.md` now has a gate-by-gate evidence table.
+  - Gates 1, 2, 4, 5 and 8 to 12 are met, with named tests.
+  - Gate 3 is partly met: no crawl of every internal link. Opened #66.
+  - Gate 6 is partly met: no leak is possible by design, but no test asserts it. Opened #67.
+  - Gate 7 is partly met: demo resets are not recorded. Opened #68.
+- **Docs refreshed for #51 to #63:**
+  - `DEMO_TOUR.md`: Settings, Help, previewed product edits, and reset from the console. `demo-tour.spec.ts` now also opens Settings.
+  - `FEATURE_TO_CLIENT_REQUEST.md`: the back-office row, and a new FAQ row.
+  - `SERVICE_ADAPTATIONS.md`: search, FAQ, branding, overview, previewed edits, the review queue and the fulfillment preview.
+- **Test fix:** the first full E2E run failed once on mobile in `help.spec.ts` (from #63). Enter on a focused FAQ question did not open it, most likely because the key press arrived before the streamed page had settled. The test now waits for the network to go idle, as the axe scans do, and checks that the answer is open before reading it.
+- **Checks:** see the PR. The audit changed no product code.
+- **PR:** [#69](https://github.com/harryfisher18/mero-moss-commerce/pull/69)
+- **Next:** #66, then #67 and #68. #49 still needs a Shopify development store and token from the owner.
+
 ## 2026-11-17: Issue #63, storefront Help & FAQ
 
 - **Previous cycle:** #61 merged as `9cafcd6` (PR #62) through auto-merge.

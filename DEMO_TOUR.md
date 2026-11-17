@@ -62,5 +62,8 @@ These are all in the console menu.
 - **Lifecycle:** journeys, previews and consent. Tick the optional email box at checkout to see one.
 - **Requests:** questions sent through the advisor's **Talk to a person** form.
 - **Integrations:** what the store is really connected to.
+- **Settings:** storefront branding with a live preview, which settings are set (never their values), and a demo reset.
 
-To start again from clean data, stop the server and run `npm run db:reset`.
+In the store itself, **Help** in the header answers common questions, quoting the stored policies. In **Products**, any edit is previewed with its effect on the storefront before you publish it.
+
+To start again from clean data, use **Settings → Reset demo data** in the console, or stop the server and run `npm run db:reset`.

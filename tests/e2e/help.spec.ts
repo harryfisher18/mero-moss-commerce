@@ -20,6 +20,8 @@ test.describe("Help & FAQ", () => {
 
   test("policy answers quote the stored policies and every link works", async ({ page }) => {
     await page.goto("/help");
+    // Interact only once the streamed answers have settled and the page is hydrated.
+    await page.waitForLoadState("networkidle");
     const entries = page.getByTestId("faq-entry");
     await expect(entries).toHaveCount(7);
 
@@ -28,6 +30,7 @@ test.describe("Help & FAQ", () => {
     await expect(returns.getByText(storedPolicy("returns"))).toBeHidden();
     await returns.locator("summary").focus();
     await page.keyboard.press("Enter");
+    await expect(returns).toHaveAttribute("open", "");
     await expect(returns.getByText(storedPolicy("returns"), { exact: true })).toBeVisible();
     await expect(returns).toContainText("From our published store policy.");
     await returns.getByRole("link", { name: "Returns policy" }).click();
