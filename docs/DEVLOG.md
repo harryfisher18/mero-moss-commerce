@@ -4,6 +4,18 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-19: Issue #66, internal link check
+
+- **Previous cycle:** #65 merged as `f870acf` (PR #69) through auto-merge.
+- **Issue:** [#66](https://github.com/harryfisher18/mero-moss-commerce/issues/66), the gap in acceptance gate 3 ("no dead links") found by the audit.
+- **Implemented:**
+  - `tests/e2e/link-crawl.ts` (pure, unit-tested in `tests/unit/link-crawl.test.ts`): extracts links from server-rendered HTML, including streamed content. A breadth-first frontier visits each path once, with caps on query variants per path (3), pages per parent path (40) and the total (250), and counts what it skips.
+  - `tests/e2e/links.spec.ts` crawls from the storefront home and from the signed-in console overview. It fails on any 4xx or 5xx response, and sends Global Privacy Control so the crawl records no analytics. External links are listed, not fetched.
+- **Result:** 89 storefront and 103 console paths checked, with no broken links. Gate 3 is now recorded as met.
+- **Limits:** links added only by client-side JavaScript after hydration are not in the HTML, so the crawl doesn't see them. Filter and sort combinations beyond the caps are skipped.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (39 files, 371 tests) · `npm run build` pass · `npm run test:e2e` pass (142 tests: 71 specs × desktop/mobile), run once to keep the machine load down. No UI changed, so there was no dev-server smoke check.
+- **Next:** #67 (no stored customer data in advisor answers), then #68 (record demo resets). #49 still needs a Shopify development store and token from the owner.
+
 ## 2026-11-17: Issue #65, acceptance-gate audit
 
 - **Previous cycle:** #63 merged as `f107310` (PR #64) through auto-merge.
