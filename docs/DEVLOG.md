@@ -14,6 +14,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 - **Result:** 89 storefront and 103 console paths checked, with no broken links. Gate 3 is now recorded as met.
 - **Limits:** links added only by client-side JavaScript after hydration are not in the HTML, so the crawl doesn't see them. Filter and sort combinations beyond the caps are skipped.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (39 files, 371 tests) · `npm run build` pass · `npm run test:e2e` pass (142 tests: 71 specs × desktop/mobile), run once to keep the machine load down. No UI changed, so there was no dev-server smoke check.
+- **PR:** [#70](https://github.com/harryfisher18/mero-moss-commerce/pull/70)
 - **Next:** #67 (no stored customer data in advisor answers), then #68 (record demo resets). #49 still needs a Shopify development store and token from the owner.
 
 ## 2026-11-17: Issue #65, acceptance-gate audit
