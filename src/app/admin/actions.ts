@@ -554,7 +554,7 @@ export async function resetDemoStoreAction(
   _previous: DemoResetState,
   formData: FormData,
 ): Promise<DemoResetState> {
-  await requireMerchant();
+  const session = await requireMerchant();
   const input = resetSchema.safeParse({ confirmation: formData.get("confirmation") ?? "" });
   if (!input.success) return { status: "error", message: "That request was not valid." };
   const check = checkDemoReset({
@@ -570,7 +570,10 @@ export async function resetDemoStoreAction(
           : "Type the confirmation phrase exactly to reset.",
     };
   }
-  const summary = resetDemoStore(getDatabase());
+  const summary = resetDemoStore(getDatabase(), {
+    actor: session.email,
+    at: new Date().toISOString(),
+  });
   return {
     status: "success",
     message: `The demo store was reset: ${String(summary.rowsRemoved)} records removed and the demo catalog restored.`,

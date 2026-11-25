@@ -95,6 +95,11 @@ test.describe("merchant settings", () => {
     expect(count("orders")).toBe(0);
     expect(count("outbox_events")).toBe(0);
     expect(count("products")).toBe(products);
+    // The reset itself is recorded and listed, and survives the reset it describes.
+    expect(count("demo_resets")).toBeGreaterThan(0);
+    const history = visible(page, "reset-history");
+    await expect(history.getByRole("listitem").first()).toContainText(DEMO_MERCHANT.email);
+    await expect(history.getByRole("listitem").first()).toContainText(/\d+ records removed/);
 
     await page.goto("/admin/orders");
     await expect(page).toHaveURL(/\/admin\/orders$/);

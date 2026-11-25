@@ -7,6 +7,7 @@ import { DemoResetForm } from "@/components/admin/demo-reset-form";
 import { settingsGroups } from "@/domain/merchant/settings";
 import { getDatabase } from "@/server/db/client";
 import { merchantCredentials } from "@/server/merchant-config";
+import { recentDemoResets } from "@/server/demo-reset";
 import { requireMerchant } from "@/server/merchant-session";
 import { SqliteBrandingRepository } from "@/server/repositories/branding-repository";
 
@@ -43,6 +44,7 @@ async function Settings() {
   const brandingRepository = new SqliteBrandingRepository(getDatabase());
   const branding = brandingRepository.get();
   const brandingHistory = brandingRepository.history();
+  const resets = recentDemoResets(getDatabase(), 5);
 
   return (
     <div className="mt-6 space-y-8">
@@ -172,6 +174,19 @@ async function Settings() {
             Not available: this store has private merchant credentials, so its data is never reset
             from the browser.
           </p>
+        )}
+        <h3 className="mt-6 font-medium">Recent resets</h3>
+        {resets.length === 0 ? (
+          <p className="mt-1 text-muted">This store has not been reset from the console.</p>
+        ) : (
+          <ol className="mt-2 space-y-1" data-testid="reset-history">
+            {resets.map((reset, index) => (
+              <li key={`${reset.createdAt}-${String(index)}`}>
+                {dateFormat.format(new Date(reset.createdAt))} UTC · {reset.actor} ·{" "}
+                {reset.rowsRemoved} records removed
+              </li>
+            ))}
+          </ol>
         )}
       </section>
     </div>
