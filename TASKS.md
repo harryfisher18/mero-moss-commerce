@@ -54,7 +54,7 @@ Legend: `[x]` merged · `[ ]` not done · `(#n)` GitHub issue
 - [x] Storefront Help & FAQ grounded in stored policies and real store behaviour (#63)
 - [x] Audit the hard acceptance gates and refresh the buyer docs (#65)
 - [x] Check every internal storefront and console link in E2E (#66)
-- [ ] Test that advisor answers never contain stored customer data (#67)
+- [x] Test that advisor answers never contain stored customer data (#67)
 - [ ] Record demo resets so the reset itself is logged (#68)
 - [ ] Verify the Shopify adapter against an authorized development store (#49, blocked: needs a store and credentials from the owner)
 

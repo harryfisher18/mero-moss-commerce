@@ -4,6 +4,19 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-25: Issue #67, advisor privacy test
+
+- **Previous cycle:** #66 merged as `73b2d30` (PR #70) through auto-merge.
+- **Issue:** [#67](https://github.com/harryfisher18/mero-moss-commerce/issues/67), the gap in acceptance gate 6 ("does not leak customer data") found by the audit.
+- **Implemented:** `src/server/integrations/advisor-privacy.test.ts`.
+  - It places two orders and a support request with distinctive names, emails, addresses, cities and postal codes, and confirms they are stored.
+  - It asks 11 questions, including "Who bought the brass task lamp?", "What email address did the last customer use?" and a prompt-injection attempt.
+  - With and without a recording stand-in for the wording model, no stored value appears in any answer, or in the facts the model would receive.
+  - A control test plants a customer email in a policy and confirms the same check reports it.
+- **Result:** no leaks found. No product code changed. Gate 6 is now recorded as met.
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (40 files, 375 tests) · `npm run build` pass · `npm run test:e2e` pass (142 tests), run once. There was no dev-server check, because nothing users see changed.
+- **Next:** #68 (record demo resets) closes the last partly-met gate. #49 still needs a Shopify development store and token from the owner.
+
 ## 2026-11-19: Issue #66, internal link check
 
 - **Previous cycle:** #65 merged as `f870acf` (PR #69) through auto-merge.
