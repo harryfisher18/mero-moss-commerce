@@ -65,7 +65,7 @@ describe("SqliteBrandingRepository", () => {
       "owner",
       "2026-11-16T10:00:00.000Z",
     );
-    resetDemoStore(db);
+    resetDemoStore(db, { actor: "owner", at: "2026-11-16T11:00:00.000Z" });
     expect(branding.get()).toEqual(DEFAULT_BRANDING);
     expect(branding.history()).toEqual([]);
   });

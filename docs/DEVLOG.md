@@ -4,6 +4,19 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
 
 ---
 
+## 2026-11-25: Issue #68, record demo resets
+
+- **Previous cycle:** #67 merged as `ee8d6b8` (PR #81) through auto-merge.
+- **Issue:** [#68](https://github.com/harryfisher18/mero-moss-commerce/issues/68), the gap in acceptance gate 7 ("all demo changes are logged") found by the audit.
+- **Implemented:**
+  - Migration 13 adds `demo_resets`. `resetDemoStore(db, { actor, at })` keeps that table and records each reset (actor, time, tables cleared, rows removed) in the same transaction as the wipe.
+  - `recentDemoResets` lists them, newest first. Settings shows the five most recent under **Reset demo data**.
+  - The Server Action passes the signed-in merchant as the actor.
+- **Result:** gate 7 is now recorded as met. Every acceptance gate is now met, apart from what #49 needs (a real Shopify store).
+- **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (40 files, 376 tests), including a record that survives later resets · `npm run build` pass · `npm run test:e2e` pass (142 tests), run once. The reset E2E asserts the listed record · `next dev` smoke check pass, with a fresh database migrated to version 13.
+- **PR:** [#82](https://github.com/harryfisher18/mero-moss-commerce/pull/82)
+- **Next:** #49 still needs a Shopify development store and token from the owner. With the gates met, the next step is the owner's priorities, or a fresh look at the market brief.
+
 ## 2026-11-25: Issue #67, advisor privacy test
 
 - **Previous cycle:** #66 merged as `73b2d30` (PR #70) through auto-merge.

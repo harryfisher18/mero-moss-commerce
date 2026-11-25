@@ -3,7 +3,7 @@ import { checkDemoReset, RESET_CONFIRMATION, settingsGroups } from "@/domain/mer
 import { CartService } from "@/server/cart-service";
 import { type Database, openDatabase } from "@/server/db/database";
 import { seedDatabase } from "@/server/db/seed";
-import { resetDemoStore } from "@/server/demo-reset";
+import { recentDemoResets, resetDemoStore } from "@/server/demo-reset";
 import { MerchantAuthService } from "@/server/merchant-auth-service";
 import { DEMO_MERCHANT_EMAIL, DEMO_MERCHANT_PASSWORD } from "@/server/merchant-config";
 import { OrderService } from "@/server/order-service";
@@ -77,7 +77,10 @@ describe("resetDemoStore", () => {
     db.prepare("UPDATE products SET title = 'Edited' WHERE id = 'prod_felt-desk-mat'").run();
     expect(count("orders")).toBe(1);
 
-    const summary = resetDemoStore(db);
+    const summary = resetDemoStore(db, {
+      actor: "owner@example.com",
+      at: "2026-11-25T10:00:00.000Z",
+    });
     expect(summary.rowsRemoved).toBeGreaterThan(0);
     for (const table of ["orders", "order_lines", "outbox_events", "carts", "analytics_events"]) {
       expect({ table, rows: count(table) }).toEqual({ table, rows: 0 });
@@ -96,5 +99,24 @@ describe("resetDemoStore", () => {
     expect(auth.verify(login.token)).not.toBeNull();
     // The migration record is kept, so the schema is not rebuilt.
     expect(count("schema_migrations")).toBeGreaterThan(0);
+    // The reset itself is recorded.
+    expect(recentDemoResets(db)).toEqual([
+      {
+        actor: "owner@example.com",
+        tablesCleared: summary.tablesCleared,
+        rowsRemoved: summary.rowsRemoved,
+        createdAt: "2026-11-25T10:00:00.000Z",
+      },
+    ]);
+  });
+
+  it("keeps the record of earlier resets through later ones, newest first", () => {
+    resetDemoStore(db, { actor: "first@example.com", at: "2026-11-25T10:00:00.000Z" });
+    resetDemoStore(db, { actor: "second@example.com", at: "2026-11-25T11:00:00.000Z" });
+    expect(recentDemoResets(db).map((r) => [r.actor, r.createdAt])).toEqual([
+      ["second@example.com", "2026-11-25T11:00:00.000Z"],
+      ["first@example.com", "2026-11-25T10:00:00.000Z"],
+    ]);
+    expect(recentDemoResets(db, 1)).toHaveLength(1);
   });
 });

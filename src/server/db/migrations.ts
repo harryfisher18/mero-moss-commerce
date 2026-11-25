@@ -373,4 +373,19 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+
+  {
+    version: 13,
+    name: "demo_resets",
+    sql: `
+      -- One row per demo reset. The reset keeps this table, so its own history survives.
+      CREATE TABLE demo_resets (
+        id             INTEGER PRIMARY KEY AUTOINCREMENT,
+        actor          TEXT NOT NULL,
+        tables_cleared INTEGER NOT NULL,
+        rows_removed   INTEGER NOT NULL,
+        created_at     TEXT NOT NULL
+      );
+    `,
+  },
 ];
