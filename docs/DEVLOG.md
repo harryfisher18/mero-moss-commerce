@@ -15,6 +15,7 @@ Newest entries first. Every `/pr-test` cycle adds one entry: date, issue, summar
   - A control test plants a customer email in a policy and confirms the same check reports it.
 - **Result:** no leaks found. No product code changed. Gate 6 is now recorded as met.
 - **Checks:** `npm run lint` pass · `npm run typecheck` pass · `npm test` pass (40 files, 375 tests) · `npm run build` pass · `npm run test:e2e` pass (142 tests), run once. There was no dev-server check, because nothing users see changed.
+- **PR:** [#81](https://github.com/harryfisher18/mero-moss-commerce/pull/81)
 - **Next:** #68 (record demo resets) closes the last partly-met gate. #49 still needs a Shopify development store and token from the owner.
 
 ## 2026-11-19: Issue #66, internal link check
